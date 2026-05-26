@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GAP_AI — OSR5 — Capabilities Deck</title>
+<style>
+/* ========================================================================
+   GLOBAL TOKENS + RESET
+   ======================================================================== */
+:root {
+  --deck-font: 'Helvetica Neue','Helvetica','Arial',sans-serif;
+  --serif-cond: 'Bodoni 72','Bodoni 72 Oldstyle','Didot','Times New Roman',serif;
+  --bg-plate: #ffffff;
+  --bg-pricing: #e0e0e0;
+  --hdr-fill: #a5a5a5;
+  --row-val: #e0e0e0;
+  --row-b:   #f0f0f0;
+  --ink:    #1a1a1a;
+  --ink-2:  #262626;
+  --chip:   #161616;
+  --chip-ink: #f4f4f4;
+  --frame:  #1f3251;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #ffffff; color: var(--ink);
+             font-family: var(--deck-font); -webkit-font-smoothing: antialiased; }
+
+/* The scroll-snap parent for the desktop dual-build. Mobile reuses it too. */
+main#deck {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: #c8c8c8 #ffffff;
+  background: #ffffff;
+}
+main#deck::-webkit-scrollbar { width: 10px; }
+main#deck::-webkit-scrollbar-track { background: #ffffff; }
+main#deck::-webkit-scrollbar-thumb { background: #c8c8c8; border-radius: 5px; }
+
+.slide.editor-slide-group { display: block; width: 100%; }
+
+.sr-only { position: absolute; left: -10000px; top: auto;
+           width: 1px; height: 1px; overflow: hidden; }
+
+/* ========================================================================
+   DESKTOP (NOT mobile-portrait)
+   ======================================================================== */
+@media not all and ((max-width: 860px) and (orientation: portrait)) {
+  .mobile-view { display: none !important; }
+
+  /* Each slide row = one snap-aligned page in the deck-scroll parent. */
+  .slide.editor-slide-group {
+    height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    background: #ffffff;
+  }
+  .deck-slide {
+    position: relative;
+    width: 100%; height: 100%;
+    background: #ffffff;
+    overflow: hidden;
+  }
+  .desktop-view { width: 100%; height: 100%; }
+  .stage { width: 100%; height: 100%;
+           display: flex; justify-content: center; align-items: center; }
+
+  /* Canvas: 16:9 fluid sizing — fill stage edge-to-edge (no artificial max-width cap). */
+  .canvas {
+    position: relative;
+    width: min(100%, calc(100vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+    background: var(--bg-plate);
+    container-type: size;
+    container-name: canvas;
+    font-family: var(--deck-font);
+    overflow: hidden;
+    margin: 0 auto;
+  }
+
+  /* ------------------------- PLATE slides (1-10, 13-20, 28, 29) -----------
+     SIMPLE: bg plate fills 16:9 canvas at native aspect (object-fit: contain).
+     COMPOSITION: bg plate as background + per-photo abs-positioned layer. */
+  .canvas.plate { background: #ffffff; }
+  .canvas.plate .plate-bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: contain; object-position: center;
+    display: block; pointer-events: none;
+    background: #ffffff;
+  }
+  /* Composition photos overlay on top of bg plate */
+  .canvas.plate .photos { position: absolute; inset: 0; pointer-events: none; }
+  .canvas.plate .photos .pp { position: absolute; overflow: hidden; background: #ffffff; }
+  .canvas.plate .photos .pp img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center;
+    display: block;
+  }
+  .canvas .slide-num {
+    position: absolute; right: 1.5%; bottom: 1.5%;
+    font-size: 1.0cqw; color: #777; font-weight: 300;
+    pointer-events: none;
+  }
+  /* GIF logo overlay — top-right of every desktop slide that has a topbar
+     (plate slides + pricing slides). Same box-coords as the video-slide
+     vp-tpl-logo so size/placement matches. */
+  .canvas .tpl-logo {
+    position: absolute;
+    left: 91.95%; top: -1.67%; width: 7.12%; height: 9.78%;
+    object-fit: contain; object-position: center;
+    pointer-events: none; z-index: 5;
+  }
+
+  /* ------------------------- VIDEO slides 11/12/21/22 -------------------- */
+  .vp-top-band      { position: absolute; left:0; right:0; top:0;  height: 7%; background:#000; }
+  .vp-top-band-grad { position: absolute; left:0; right:0; top: 7%; height: 3%;
+                       background: linear-gradient(#555 0%, #ffffff 100%); }
+  .vp-slide-bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    display: block; pointer-events: none;
+  }
+  .vp-tpl-logo {
+    position: absolute;
+    left: 91.95%; top: -1.67%; width: 7.12%; height: 9.78%;
+    object-fit: contain; object-position: center;
+    pointer-events: none;
+  }
+  /* Live editor-surfaceable text: .L > .t */
+  .vp .L {
+    position: absolute;
+    left: 5.07%; top: 16.94%; width: 19.09%; min-height: 6.73%;
+    display: flex; flex-direction: column; gap: 0.1cqh;
+    font-family: 'Arial', sans-serif;
+    color: var(--ink);
+  }
+  .vp .L > .t { display: block; margin: 0; line-height: 1.1; font-size: 1.25cqw; }
+  .vp .L > .t.eyebrow { font-weight: 700; }
+  .vp .L > .t.kicker  { font-weight: 400; }
+
+  .video-panel {
+    position: absolute;
+    overflow: hidden;
+    background: transparent;
+  }
+  .video-panel video, .video-panel .video-poster {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: contain; object-position: center top;
+    background: #ffffff; display: block;
+  }
+  .video-panel .video-poster { z-index: 1; pointer-events: none; }
+  .video-panel video          { z-index: 2; }
+
+  /* Per-slide video panel coords (from PPTX EMU) */
+  #slide-11 .video-panel { left: 49.78%; top: 10.71%; width: 50.22%; height: 89.29%; }
+  #slide-12 .video-panel { left: 49.67%; top: 10.64%; width: 50.29%; height: 89.40%; }
+  #slide-21 .video-panel { left: 49.73%; top: 10.62%; width: 50.27%; height: 89.37%; }
+  #slide-22 .video-panel { left: 50.13%; top: 10.77%; width: 50.19%; height: 89.23%; }
+
+  /* Slide 22 product-mix overlay images */
+  #slide-22 .product-mix { position: absolute; inset: 0; pointer-events: none; }
+  #slide-22 .product-mix .px { position: absolute; overflow: hidden; }
+  #slide-22 .product-mix .px img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  #slide-22 .px-55 { left: 28.31%; top: 10.77%; width: 21.69%; height: 29.24%; }
+  #slide-22 .px-56 { left: 40.03%; top: 51.63%; width:  9.92%; height: 32.38%; }
+  #slide-22 .px-57 { left: 39.98%; top: 37.50%; width: 10.02%; height: 13.88%; }
+  #slide-22 .px-58 { left: 28.31%; top: 37.54%; width: 11.54%; height: 26.81%; }
+
+  /* Unmute affordance shared across video slides */
+  .unmute-btn {
+    position: absolute;
+    right: 1.4cqw; bottom: 1.4cqw;
+    width: 2.6cqw; height: 2.6cqw; min-width: 32px; min-height: 32px;
+    border-radius: 999px;
+    background: rgba(15,15,15,0.65);
+    border: 1px solid rgba(255,255,255,0.30);
+    color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    transition: background 120ms ease, transform 120ms ease;
+    z-index: 5; padding: 0;
+  }
+  .unmute-btn:hover { background: rgba(20,20,20,0.85); transform: scale(1.04); }
+  .unmute-btn svg { width: 55%; height: 55%; display: block; }
+  .unmute-btn .ic-unmuted { display: none; }
+  .unmute-btn.is-unmuted .ic-muted   { display: none; }
+  .unmute-btn.is-unmuted .ic-unmuted { display: block; }
+
+  /* ------------------------- PRICING slides 23-26 ------------------------- */
+  .canvas.pricing {
+    background: var(--bg-pricing);
+  }
+  .canvas.pricing .top-band      { position: absolute; left:0; right:0; top:0; height: 7%; background:#000; }
+  .canvas.pricing .top-band-grad { position: absolute; left:0; right:0; top: 7%; height: 3%;
+                                    background: linear-gradient(#555 0%, var(--bg-pricing) 100%); }
+  .canvas.pricing .L {
+    position: absolute; left: 52.07%; top: 12.75%; width: 46.54%; height: 85.27%;
+    color: var(--ink); display: flex; flex-direction: column;
+  }
+  .canvas.pricing .L > .t {
+    display: block; font-family: var(--deck-font);
+    font-weight: 300; line-height: 1.05; color: var(--ink); margin: 0;
+  }
+  .canvas.pricing .L > .t.hdl-1 { font-size: 3.75cqw; margin-bottom: 0.8cqh; }
+  .canvas.pricing .L > .t.hdl-2 { font-size: 2.08cqw; margin-bottom: 0.3cqh; }
+  .canvas.pricing .L > .t.hdl-3 { font-size: 1.67cqw; margin-bottom: 2.2cqh; }
+  .canvas.pricing .ptable {
+    display: grid; grid-template-columns: 22.88% 42.45% 34.67%;
+    width: 100%; font-size: 1.18cqw; line-height: 1.25;
+    color: var(--ink); margin-top: 0.4cqh;
+  }
+  .canvas.pricing .ptable-row  { display: contents; }
+  .canvas.pricing .ptable-cell { padding: 0.95cqw 1.05cqw; background: var(--row-val); }
+  .canvas.pricing .ptable-row.row-b .ptable-cell { background: var(--row-b); }
+  .canvas.pricing .ptable-head .ptable-cell { background: var(--hdr-fill); color: var(--ink); font-weight: 700; }
+  .canvas.pricing .ptable-cell .b { font-weight: 700; }
+  .canvas.pricing .ptable-cell.col-block .num { font-weight: 700; display: inline-block; }
+  .canvas.pricing .ptable-cell.col-block .lbl { font-weight: 400; }
+  .canvas.pricing .ptable-cell.col-price .price { font-weight: 700; }
+  .canvas.pricing .L .footnotes { margin-top: 1.8cqh; display: flex; flex-direction: column; gap: 0.9cqh; }
+  .canvas.pricing .L .footnotes > div { color: var(--ink); line-height: 1.35; }
+  .canvas.pricing .L .footnotes .b { font-weight: 700; }
+
+  /* Slide-23 collage (left half) */
+  #slide-23 .collage { position: absolute; left: 0; top: 0; width: 50.52%; height: 100%; }
+  #slide-23 .collage .ph { position: absolute; overflow: hidden; background: #ddd; }
+  #slide-23 .collage .ph img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+  #slide-23 .ph-7  { left:  2.29%; top: 14.92%; width: 10.43%; height: 39.57%; }
+  #slide-23 .ph-8  { left:  2.29%; top: 55.38%; width: 10.29%; height: 41.58%; }
+  #slide-23 .ph-6  { left: 13.17%; top: 14.92%; width: 13.32%; height: 57.41%; }
+  #slide-23 .ph-9b { left: 13.17%; top: 72.97%; width: 13.32%; height: 23.99%; }
+  #slide-23 .ph-60 { left: 26.94%; top: 14.92%; width: 12.06%; height: 22.07%; }
+  #slide-23 .ph-9a { left: 26.88%; top: 37.92%; width: 12.12%; height: 24.53%; }
+  #slide-23 .ph-12 { left: 26.95%; top: 63.38%; width: 12.42%; height: 33.58%; }
+  #slide-23 .ph-10 { left: 39.37%; top: 14.92%; width: 11.15%; height: 32.01%; }
+  #slide-23 .ph-11 { left: 39.37%; top: 47.67%; width: 11.16%; height: 49.19%; }
+  #slide-23 .ph-frame {
+    position: absolute; left: 25.89%; top: 36.01%;
+    width: 14.0%; height: 27.36%;
+    border: 0.45cqw solid var(--frame); pointer-events: none;
+  }
+
+  /* Slide-24/25 contact-sheet */
+  #slide-24 .thumbs, #slide-25 .thumbs {
+    position: absolute; left: 0; top: 0; width: 50.5%; height: 100%;
+  }
+  #slide-24 .thumbs .th, #slide-25 .thumbs .th {
+    position: absolute; width: 7.5%; height: 13.33%;
+    overflow: hidden; background: #d0d0d0;
+  }
+  #slide-24 .thumbs .th img, #slide-25 .thumbs .th img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  /* Slide-24 rows */
+  #slide-24 .row-1 { top: 11.08%; }
+  #slide-24 .row-2 { top: 26.09%; }
+  #slide-24 .row-3 { top: 40.61%; }
+  #slide-24 .row-4 { top: 55.12%; }
+  #slide-24 .row-5 { top: 69.85%; }
+  #slide-24 .row-6 { top: 84.70%; }
+  #slide-24 .col-1 { left:  0.30%; }
+  #slide-24 .col-2 { left: 16.16%; }
+  #slide-24 .col-3 { left: 32.55%; }
+  #slide-24 .col-4 { left: 48.91%; }
+  #slide-24 .col-5 { left: 65.27%; }
+  #slide-24 .col-6 { left: 81.27%; }
+  #slide-24 .ph-frame { position: absolute; left: -1.05%; top: 68.34%;
+                        width: 51.05%; height: 15.93%;
+                        border: 0.55cqw solid var(--frame); pointer-events: none; }
+  /* Slide-25 rows */
+  #slide-25 .row-1 { top: 11.70%; }
+  #slide-25 .row-2 { top: 26.50%; }
+  #slide-25 .row-3 { top: 41.30%; }
+  #slide-25 .row-4 { top: 55.70%; }
+  #slide-25 .row-5 { top: 70.45%; }
+  #slide-25 .row-6 { top: 85.05%; }
+  #slide-25 .col-1 { left:  1.94%; }
+  #slide-25 .col-2 { left: 18.32%; }
+  #slide-25 .col-3 { left: 34.69%; }
+  #slide-25 .col-4 { left: 51.09%; }
+  #slide-25 .col-5 { left: 67.46%; }
+  #slide-25 .col-6 { left: 83.84%; }
+  #slide-25 .ph-frame { position: absolute; left: 0.58%; top: 39.99%;
+                        width: 49.55%; height: 15.44%;
+                        border: 0.55cqw solid var(--frame); pointer-events: none; }
+
+  /* Slide-26 faces */
+  #slide-26 .faces { position: absolute; left: 0; top: 0; width: 50%; height: 100%; }
+  #slide-26 .face { position: absolute; overflow: hidden; background: #d0d0d0; }
+  #slide-26 .face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #slide-26 .face-131 { left:  3.56%; top: 18.72%; width: 13.69%; height: 24.43%; }
+  #slide-26 .face-133 { left: 18.63%; top: 18.65%; width: 12.73%; height: 24.96%; }
+  #slide-26 .face-135 { left:  3.34%; top: 44.38%; width: 13.60%; height: 24.43%; }
+  #slide-26 .face-132 { left: 17.90%; top: 44.80%; width: 13.89%; height: 24.52%; }
+  #slide-26 .face-134 { left: 32.74%; top: 44.38%; width: 13.83%; height: 24.93%; }
+  #slide-26 .face-136 { left: 17.90%; top: 71.74%; width: 13.89%; height: 24.43%; }
+  #slide-26 .face-130 { left: 32.98%; top: 71.74%; width: 13.60%; height: 24.43%; }
+  #slide-26 .ph-frame { position: absolute; left: 17.12%; top: 43.18%;
+                        width: 15.51%; height: 27.36%;
+                        border: 0.55cqw solid var(--frame); pointer-events: none; }
+
+  /* ------------------------- PRICING slide 27 (3-table recap) ------------- */
+  #slide-27 .canvas { background: var(--bg-pricing); }
+  #slide-27 .top-band      { position: absolute; left:0; right:0; top:0; height: 7%; background:#000; }
+  #slide-27 .top-band-grad { position: absolute; left:0; right:0; top: 7%; height: 4%;
+                              background: linear-gradient(#555 0%, var(--bg-pricing) 100%); }
+  #slide-27 .L {
+    position: absolute; left: 1.86%; top: 10.74%; width: 96.86%; height: 9.42%;
+    display: flex; align-items: center; gap: 0.9cqw;
+  }
+  #slide-27 .L .logo { width: 2.78cqw; height: 2.78cqw; flex: 0 0 auto; display: block; }
+  #slide-27 .L .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  #slide-27 .L > .t {
+    display: block; font-family: var(--deck-font);
+    font-size: 5.6cqw; font-weight: 300; line-height: 1; color: var(--ink); margin: 0;
+  }
+  #slide-27 .ptable {
+    position: absolute; width: 96.86%;
+    display: grid; grid-template-columns: 25.18% 25.18% 25.18% 24.45%;
+    font-size: 1.55cqw; line-height: 1.25; color: var(--ink);
+    gap: 0.10cqw 0.10cqw; background: #ffffff;
+  }
+  #slide-27 .ptable.tbl-1 { left: 1.86%; top: 20.17%; height: 25.57%; }
+  #slide-27 .ptable.tbl-2 { left: 1.70%; top: 46.83%; height: 25.57%; }
+  #slide-27 .ptable.tbl-3 { left: 1.70%; top: 73.50%; height: 25.57%; }
+  #slide-27 .ptable-row  { display: contents; }
+  #slide-27 .ptable-cell { padding: 0 1.4cqw; display: flex; align-items: center;
+                            background: var(--row-val); }
+  #slide-27 .ptable-head .ptable-cell { background: var(--hdr-fill); color: #ffffff; font-weight: 400; }
+  #slide-27 .ptable-cell .row-label   { font-weight: 400; color: var(--ink); }
+  #slide-27 .ptable-cell .price       { font-weight: 400; font-size: 1.85cqw; }
+  #slide-27 .ptable-cell.col-label    { justify-content: flex-start; padding-left: 1.55cqw; }
+  #slide-27 .ptable-cell.col-val      { justify-content: center; }
+
+  /* ------------------------- SLIDE 30 outro (full-bleed video) ----------- */
+  #slide-30 .video-fill {
+    position: absolute;
+    left: 0; top: -0.09%; width: 100.09%; height: 100.09%;
+    overflow: hidden; isolation: isolate;
+  }
+  #slide-30 .video-fill video,
+  #slide-30 .video-fill .video-poster {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; object-position: center; display: block; background: #ffffff;
+  }
+  #slide-30 .video-fill > .video-poster { z-index: 1; pointer-events: none; }
+  #slide-30 .video-fill > video          { z-index: 2; }
+}
+
+/* ========================================================================
+   MOBILE (≤860px portrait)
+   ======================================================================== */
+@media (max-width: 860px) and (orientation: portrait) {
+  .desktop-view { display: none !important; }
+
+  main#deck { height: 100svh; scroll-snap-type: y mandatory; }
+  .slide.editor-slide-group {
+    height: 100svh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    background: #fff;
+  }
+  /* Composition + simple-reflow plates can grow taller than 100svh on mobile. */
+  .slide.editor-slide-group.plate-composition,
+  .slide.editor-slide-group.plate-simple-reflow {
+    height: auto; min-height: 100svh;
+    scroll-snap-stop: normal;
+  }
+  .slide.editor-slide-group.plate-composition .deck-slide,
+  .slide.editor-slide-group.plate-simple-reflow .deck-slide {
+    position: relative; width: 100vw;
+    height: auto; min-height: 100svh;
+    background: #fff; overflow: visible;
+  }
+  /* Diagram slides (28, 29) — explicitly enlarged via aspect-ratio of the imagery
+     so they fill viewport height even though the diagram is horizontal. */
+  .slide.editor-slide-group.plate-simple-reflow:has(.mobile-view.plate.simple-reflow.diagram) .deck-slide {
+    min-height: 100svh;
+  }
+  .deck-slide {
+    position: relative; width: 100vw; height: 100svh;
+    background: #fff; overflow: hidden;
+  }
+  .mobile-view {
+    position: relative; width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    background: #fff;
+  }
+
+  /* Topbar shared */
+  .m-topbar { width: 100%; height: 7vh; background: #000;
+              display: flex; align-items: center; padding: 0 5vw;
+              color: #fff; font-size: 12px; letter-spacing: 0.05em; flex: 0 0 auto;
+              gap: 10px; }
+  .m-topbar .m-tpl-logo { height: 22px; width: auto;
+              margin-left: auto; display: block; }
+  .m-topbar .m-count { opacity: 0.7; font-size: 11px; }
+
+  /* PLATE mobile — two patterns:
+       SIMPLE: bg plate full-bleed, object-fit:contain on white, no letterbox strip.
+       COMPOSITION: live header (.L > .t) + N stacked product photos, full-width on white. */
+  .mobile-view.plate {
+    background: #ffffff;
+    height: auto; min-height: 100svh;
+    overflow-y: auto;
+    display: flex; flex-direction: column;
+  }
+  /* SIMPLE — bg plate fills as much width as it can while preserving aspect (no crop). */
+  .mobile-view.plate.simple .plate-img-wrap {
+    flex: 1 1 auto; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: #ffffff; overflow: hidden;
+    padding: 0;
+  }
+  .mobile-view.plate.simple .plate-img-wrap img {
+    width: 100%; max-height: 100%;
+    object-fit: contain; display: block;
+    background: #ffffff;
+  }
+  /* COMPOSITION — live header + stacked product photos */
+  .mobile-view.plate.composition { background: #ffffff; }
+  .mobile-view.plate.composition .m-header.L {
+    padding: 20px 6vw 14px;
+    display: flex; flex-direction: column; gap: 4px;
+    background: #ffffff; flex: 0 0 auto;
+  }
+  .mobile-view.plate.composition .m-header.L > .t {
+    display: block; margin: 0; line-height: 1.1;
+    font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1a1a1a;
+  }
+  .mobile-view.plate.composition .m-header.L > .t.plate-title {
+    font-size: 18px; font-weight: 400; letter-spacing: 0.005em;
+  }
+  .mobile-view.plate.composition .m-header.L > .t.plate-color {
+    font-size: 13px; font-weight: 400; margin-top: 2px;
+    color: var(--plate-color, #2c4a6b);
+  }
+  .mobile-view.plate.composition .m-photos {
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 0 0 18px;
+    background: #ffffff;
+  }
+  .mobile-view.plate.composition .m-photos .m-photo {
+    width: 100%; aspect-ratio: 3 / 4;
+    background: #f4f4f4; overflow: hidden;
+  }
+  .mobile-view.plate.composition .m-photos .m-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    display: block;
+  }
+
+  /* SIMPLE-REFLOW — for slides 1, 2, 3, 13, 14, 28, 29.
+     Decomposes the bg plate into live header + full-width imagery panels.
+     Variants: .cover (text-only centered), .product (header + product strip),
+               .faces (header + face circles), .diagram (title + diagram). */
+  .mobile-view.plate.simple-reflow { background: #ffffff; }
+  .mobile-view.plate.simple-reflow .m-header.L {
+    padding: 22px 6vw 14px;
+    display: flex; flex-direction: column;
+    background: #ffffff; flex: 0 0 auto;
+    gap: 6px;
+  }
+  .mobile-view.plate.simple-reflow .m-header.L > .t {
+    display: block; margin: 0; line-height: 1.15;
+    font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1a1a1a;
+  }
+  .mobile-view.plate.simple-reflow .m-wordmark {
+    display: block; height: 46px; width: auto;
+    align-self: flex-start;
+  }
+  .mobile-view.plate.simple-reflow .m-header.L > .t.plate-title {
+    font-size: 22px; font-weight: 700; letter-spacing: 0; margin-top: 6px;
+  }
+  .mobile-view.plate.simple-reflow .m-header.L > .t.plate-subtitle {
+    font-size: 13px; font-weight: 400; color: #4a4a4a; margin-top: 2px;
+  }
+  .mobile-view.plate.simple-reflow .m-header.L > .t.plate-body {
+    font-size: 13px; font-weight: 400; color: #2c2c2c;
+    line-height: 1.4; margin-top: 6px;
+  }
+  .mobile-view.plate.simple-reflow .m-header.L .plate-colors {
+    display: flex; flex-direction: column; gap: 2px; margin-top: 10px;
+  }
+  .mobile-view.plate.simple-reflow .m-header.L .plate-colors .t {
+    font-size: 12px; font-weight: 700; line-height: 1.3;
+  }
+  .mobile-view.plate.simple-reflow .m-imagery {
+    width: 100%; padding: 8px 0 18px;
+    background: #ffffff; flex: 0 0 auto;
+  }
+  .mobile-view.plate.simple-reflow .m-imagery img {
+    width: 100%; height: auto; display: block; object-fit: contain;
+    background: #ffffff;
+  }
+  /* Stacked product panels — slides 2, 13 */
+  .mobile-view.plate.simple-reflow.product .m-photos {
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 8px 0 18px; background: #ffffff; flex: 0 0 auto;
+  }
+  .mobile-view.plate.simple-reflow.product .m-photos .m-photo {
+    width: 100%;
+    background: #e0e0e0; overflow: hidden;
+  }
+  .mobile-view.plate.simple-reflow.product .m-photos .m-photo img {
+    width: 100%; height: auto; display: block;
+  }
+  /* Stacked face circles — slides 3, 14 (each face full-width on grey, circular crop) */
+  .mobile-view.plate.simple-reflow.faces .m-faces {
+    display: flex; flex-direction: column; gap: 0;
+    padding: 0; background: #e0e0e0; flex: 0 0 auto;
+  }
+  .mobile-view.plate.simple-reflow.faces .m-faces .m-face {
+    width: 100%; aspect-ratio: 1 / 1;
+    background: #e0e0e0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mobile-view.plate.simple-reflow.faces .m-faces .m-face img {
+    width: 100%; height: 100%; object-fit: contain; object-position: center;
+    display: block;
+  }
+  /* COVER variant (slide 1) — text-only, centered vertically on the slide's teal bg */
+  .mobile-view.plate.simple-reflow.cover {
+    display: flex; flex-direction: column;
+    background: #d4dcdb;
+  }
+  .mobile-view.plate.simple-reflow.cover .m-cover-body {
+    flex: 1 1 auto;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 0 8vw;
+    background: #d4dcdb;
+    text-align: center;
+  }
+  /* Cover override — header gets no white card, inherits teal */
+  .mobile-view.plate.simple-reflow.cover .m-cover-body .m-header.L {
+    background: transparent;
+    align-items: center; padding: 0;
+    text-align: center;
+  }
+  .mobile-view.plate.simple-reflow.cover .m-header.L .m-wordmark {
+    height: 69px; margin: 0 0 10px;
+    align-self: center;
+  }
+  .mobile-view.plate.simple-reflow.cover .m-header.L > .t.plate-title {
+    font-size: 26px; font-weight: 700; margin: 0;
+  }
+  .mobile-view.plate.simple-reflow.cover .m-header.L > .t.plate-subtitle {
+    font-size: 13px; color: #2c2c2c; margin: 4px 0 0;
+  }
+  /* DIAGRAM variant (slides 28, 29) — title + diagram, slide expands to fill viewport
+     by enlarging the diagram to use natural width. Background is the slide's light grey. */
+  .mobile-view.plate.simple-reflow.diagram {
+    background: #e0e0e0;
+    display: flex; flex-direction: column;
+  }
+  .mobile-view.plate.simple-reflow.diagram .m-diagram-body {
+    flex: 1 1 auto;
+    display: flex; flex-direction: column;
+    justify-content: flex-start;
+    background: #e0e0e0;
+    padding: 24px 0 0;
+  }
+  .mobile-view.plate.simple-reflow.diagram .m-header.L {
+    background: transparent;
+    padding: 0 6vw 18px;
+  }
+  .mobile-view.plate.simple-reflow.diagram .m-header.L > .t.plate-title {
+    font-size: 28px; font-weight: 400; margin: 0;
+    letter-spacing: -0.005em;
+  }
+  .mobile-view.plate.simple-reflow.diagram .m-imagery {
+    padding: 0 2vw; background: transparent;
+    flex: 1 1 auto;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mobile-view.plate.simple-reflow.diagram .m-imagery img {
+    width: 100%; height: auto; max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* VIDEO slides 11/12/21/22 — text-stacked-above-video */
+  .vp .m-topgrad { width: 100%; height: 18px;
+                   background: linear-gradient(#555 0%, #ffffff 100%); flex: 0 0 auto; }
+  .vp .m-copy { padding: 14px 6vw 4px; display: flex; flex-direction: column; gap: 4px;
+                background: #fff; flex: 0 0 auto; }
+  .vp .m-copy .m-product { font-size: 13px; font-weight: 400; color: var(--ink); margin: 0 0 8px; }
+  .vp .m-copy .m-wordmark {
+    display: block; height: 40px; width: auto;
+    align-self: flex-start;
+    margin: 8px 0 8px;
+  }
+  .vp .m-copy .m-tagline {
+    font-size: 22px; font-weight: 800; color: var(--ink);
+    line-height: 1.05; margin: 2px 0 12px;
+  }
+  .vp .m-copy .m-chip {
+    display: inline-block; background: var(--chip); color: var(--chip-ink);
+    padding: 7px 14px; border-radius: 4px;
+    font-size: 13px; font-weight: 400;
+    align-self: flex-start; margin-bottom: 8px;
+  }
+  .vp .m-video {
+    position: relative;
+    margin: 8px 0 0;
+    width: 100%; aspect-ratio: 1 / 1;
+    background: #ffffff; overflow: hidden;
+    flex: 0 0 auto;
+  }
+  .vp .m-video video, .vp .m-video .video-poster {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; object-position: center; display: block;
+  }
+  .vp .m-video .video-poster { z-index: 1; pointer-events: none; }
+  .vp .m-video video         { z-index: 2; }
+  .vp .m-video .unmute-btn   {
+    position: absolute; right: 14px; bottom: 14px;
+    width: 40px; height: 40px; border-radius: 999px;
+    background: rgba(15,15,15,0.65); border: 1px solid rgba(255,255,255,0.30);
+    color: #fff; display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    z-index: 5; padding: 0;
+  }
+  .vp .m-video .unmute-btn svg { width: 55%; height: 55%; display: block; }
+  .vp .m-video .unmute-btn .ic-unmuted { display: none; }
+  .vp .m-video .unmute-btn.is-unmuted .ic-muted   { display: none; }
+  .vp .m-video .unmute-btn.is-unmuted .ic-unmuted { display: block; }
+
+  /* PRICING slides 23-26 — stacked cards */
+  .mobile-view.pricing { background: var(--bg-pricing); }
+  .mobile-view.pricing .m-hero { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+                                  padding: 10px 5vw 0; flex: 0 0 auto; }
+  .mobile-view.pricing .m-hero img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover;
+                                       display: block; background: #ccc; }
+  .mobile-view.pricing .m-hero .featured { outline: 3px solid var(--frame); outline-offset: -3px; }
+  .mobile-view.pricing .m-copy.L { padding: 14px 5vw 4px;
+                                    display: flex; flex-direction: column; gap: 4px; flex: 0 0 auto; }
+  .mobile-view.pricing .m-copy.L > .t.hdl-1 { font-size: 24px; font-weight: 300; line-height: 1.05;
+                                               margin: 0; color: var(--ink); }
+  .mobile-view.pricing .m-copy.L > .t.hdl-2 { font-size: 14px; font-weight: 300; line-height: 1.2;
+                                               margin: 0; color: var(--ink-2); }
+  .mobile-view.pricing .m-copy.L > .t.hdl-3 { font-size: 12px; font-weight: 300; line-height: 1.25;
+                                               margin: 0 0 4px; color: var(--ink-2); }
+  .mobile-view.pricing .m-cards { padding: 6px 5vw 0; display: flex; flex-direction: column; gap: 10px;
+                                   flex: 1 1 auto; overflow-y: auto; }
+  .mobile-view.pricing .m-card {
+    background: #fff; border: 1px solid #c8c8c8; border-radius: 8px;
+    padding: 10px 12px 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .mobile-view.pricing .m-card-label { font-size: 10px; letter-spacing: 0.10em;
+                                       text-transform: uppercase; color: #8a8a8a;
+                                       margin-bottom: 3px; display: block; }
+  .mobile-view.pricing .m-card-block { font-size: 18px; font-weight: 700; color: var(--ink);
+                                       line-height: 1.1; margin-bottom: 2px; }
+  .mobile-view.pricing .m-card-block .b-sub { display: block; font-size: 11px; font-weight: 400;
+                                               color: #555; text-transform: uppercase;
+                                               letter-spacing: 0.04em; margin-top: 2px; }
+  .mobile-view.pricing .m-card-price { margin-top: 9px; display: flex; align-items: baseline; gap: 7px;
+                                       border-top: 1px solid #ececec; padding-top: 8px; }
+  .mobile-view.pricing .m-card-price .p-amt { font-size: 22px; font-weight: 700; color: var(--ink); }
+  .mobile-view.pricing .m-card-price .p-unit { font-size: 11px; color: #555;
+                                                text-transform: uppercase; letter-spacing: 0.04em; }
+  .mobile-view.pricing .m-card-comment { margin-top: 9px; font-size: 12px; line-height: 1.35;
+                                          color: #333; border-top: 1px solid #ececec; padding-top: 8px; }
+  .mobile-view.pricing .m-card-comment .b { font-weight: 700; color: var(--ink); }
+  .mobile-view.pricing .m-foot.L { padding: 10px 5vw 16px; display: flex; flex-direction: column;
+                                    gap: 6px; flex: 0 0 auto; }
+  .mobile-view.pricing .m-foot.L > div { font-size: 11px; color: #333; line-height: 1.35; }
+  .mobile-view.pricing .m-foot.L .b { font-weight: 700; color: var(--ink); }
+
+  /* PRICING slide 27 — transposed sections */
+  .mobile-view.pricing-27 { background: var(--bg-pricing); }
+  .mobile-view.pricing-27 .m-title.L { padding: 14px 5vw 6px;
+                                        display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+  .mobile-view.pricing-27 .m-title.L .logo { width: 28px; height: 28px; flex: 0 0 auto; }
+  .mobile-view.pricing-27 .m-title.L .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .mobile-view.pricing-27 .m-title.L > .t { font-size: 22px; font-weight: 300; line-height: 1.05;
+                                             color: var(--ink); margin: 0; }
+  .mobile-view.pricing-27 .m-sections { padding: 8px 5vw 12px;
+                                         display: flex; flex-direction: column; gap: 12px;
+                                         flex: 1 1 auto; overflow-y: auto; }
+  .mobile-view.pricing-27 .m-sec { background: #fff; border: 1px solid #c8c8c8;
+                                   border-radius: 8px; overflow: hidden;
+                                   box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+  .mobile-view.pricing-27 .m-sec-head { background: var(--hdr-fill); color: #fff; padding: 9px 12px; }
+  .mobile-view.pricing-27 .m-sec-head .m-sec-cat { font-size: 14px; font-weight: 500; line-height: 1.15; }
+  .mobile-view.pricing-27 .m-sec-head .m-sec-sub { display: block; font-size: 10px; font-weight: 400;
+                                                    letter-spacing: 0.06em; text-transform: uppercase;
+                                                    color: rgba(255,255,255,0.85); margin-top: 2px; }
+  .mobile-view.pricing-27 .m-sec-row { display: flex; align-items: baseline; justify-content: space-between;
+                                        gap: 10px; padding: 9px 12px; border-top: 1px solid #ececec; }
+  .mobile-view.pricing-27 .m-sec-row:first-of-type { border-top: none; }
+  .mobile-view.pricing-27 .m-sec-row .lbl { font-size: 13px; color: #2a2a2a; }
+  .mobile-view.pricing-27 .m-sec-row .val { font-size: 19px; font-weight: 700; color: var(--ink); flex: 0 0 auto; }
+  .mobile-view.pricing-27 .m-sec-row .val .unit { font-size: 10px; font-weight: 400; color: #555;
+                                                    text-transform: uppercase; letter-spacing: 0.04em;
+                                                    margin-left: 6px; }
+
+  /* SLIDE 30 mobile — full-bleed 9:16 center-crop */
+  .mobile-view.outro { background: #ffffff; }
+  .mobile-view.outro .m-video-fill {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+  }
+  .mobile-view.outro .m-video-fill video,
+  .mobile-view.outro .m-video-fill .video-poster {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; object-position: center center; display: block; background: #fff;
+  }
+  .mobile-view.outro .m-video-fill > .video-poster { z-index: 1; pointer-events: none; }
+  .mobile-view.outro .m-video-fill > video         { z-index: 2; }
+  .mobile-view.outro .m-video-fill .unmute-btn {
+    position: absolute;
+    right: calc(24px + env(safe-area-inset-right, 0px));
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    width: 44px; height: 44px; border-radius: 999px;
+    background: rgba(15,15,15,0.65); border: 1px solid rgba(255,255,255,0.30);
+    color: #fff; display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    z-index: 5; padding: 0;
+  }
+  .mobile-view.outro .m-video-fill .unmute-btn svg { width: 55%; height: 55%; display: block; }
+  .mobile-view.outro .m-video-fill .unmute-btn .ic-unmuted { display: none; }
+  .mobile-view.outro .m-video-fill .unmute-btn.is-unmuted .ic-muted   { display: none; }
+  .mobile-view.outro .m-video-fill .unmute-btn.is-unmuted .ic-unmuted { display: block; }
+}
+</style>
+</head>
+<body>
+
+<main id="deck">
+
+<div class="slide editor-slide-group plate-simple-reflow" data-editor-slide="1" data-slide="1">
+<section class="deck-slide" id="slide-01" data-slide="1" aria-labelledby="slide-01-title">
+  <div class="sr-only"><h2 id="slide-01-title">Slide 1 — Gap Product on Talent</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s01/image1.png" alt="" draggable="false">
+        <div class="slide-num">1</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate simple-reflow cover" aria-label="Mobile layout for slide 1">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">01 / 30</span></header>
+    <div class="m-cover-body">
+      <div class="m-header L">
+        <img class="m-wordmark" src="https://media.globalimaige.com/shared/gap/brand/gap_wordmark_s01.png" alt="GAP">
+        <span class="t plate-title">Gap Product on Talent</span>
+        <span class="t plate-subtitle">Lifestyle live action, studio clips from Product Flat Lays</span>
+      </div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-simple-reflow" data-editor-slide="2" data-slide="2">
+<section class="deck-slide" id="slide-02" data-slide="2" aria-labelledby="slide-02-title">
+  <div class="sr-only"><h2 id="slide-02-title">Slide 2 — WOMEN'S JEANS</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s02/image3.png" alt="" draggable="false">
+        <div class="slide-num">2</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate simple-reflow product" aria-label="Mobile layout for slide 2">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">02 / 30</span></header>
+    <div class="m-header L">
+      <img class="m-wordmark" src="https://media.globalimaige.com/shared/gap/brand/gap_wordmark_s01.png" alt="GAP" style="margin-bottom:6px;">
+      <span class="t plate-title">WOMEN'S JEANS</span>
+      <span class="t plate-subtitle">Women High Rise 90s Slim Straight Jeans</span>
+      <div class="plate-colors">
+        <span class="t plate-color-label" style="color:#2c4a6b;">Color Medium Wash</span>
+        <span class="t plate-color-label" style="color:#88a4c4;">Color Light Indigo Blue</span>
+        <span class="t plate-color-label" style="color:#c2b89c;">Color Light Indigo Acid</span>
+      </div>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s02/_jean1.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s02/_jean2.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s02/_jean3.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-simple-reflow" data-editor-slide="3" data-slide="3">
+<section class="deck-slide" id="slide-03" data-slide="3" aria-labelledby="slide-03-title">
+  <div class="sr-only"><h2 id="slide-03-title">Slide 3 — FEMALE TALENT ARCHETYPES</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s03/image4.png" alt="" draggable="false">
+        <div class="slide-num">3</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate simple-reflow faces" aria-label="Mobile layout for slide 3">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">03 / 30</span></header>
+    <div class="m-header L">
+      <img class="m-wordmark" src="https://media.globalimaige.com/shared/gap/brand/gap_wordmark_s01.png" alt="GAP" style="margin-bottom:6px;">
+      <span class="t plate-title">FEMALE TALENT ARCHETYPES</span>
+      <span class="t plate-body">Everyday women, friendly, approachable, casual, progressive, attitude driven, diversity, all body positive types, inclusive</span>
+    </div>
+    <div class="m-faces">
+      <div class="m-face"><img src="https://media.globalimaige.com/shared/gap/plates/s03/_face1.png" alt=""></div>
+      <div class="m-face"><img src="https://media.globalimaige.com/shared/gap/plates/s03/_face2.png" alt=""></div>
+      <div class="m-face"><img src="https://media.globalimaige.com/shared/gap/plates/s03/_face3.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="4" data-slide="4">
+<section class="deck-slide" id="slide-04" data-slide="4" aria-labelledby="slide-04-title">
+  <div class="sr-only"><h2 id="slide-04-title">Slide 4 — Women High Rise 90s Slim Straight Jeans, Color Medium Wash</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s04/image5.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 42.417%; top: 22.508%; width: 17.431%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s04/image6.png" alt=""></div>
+          <div class="pp" style="left: 21.421%; top: 22.508%; width: 19.803%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s04/image7.png" alt=""></div>
+          <div class="pp" style="left: 1.681%; top: 22.508%; width: 18.595%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s04/image8.png" alt=""></div>
+          <div class="pp" style="left: 61.041%; top: 22.508%; width: 37.109%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s04/image9.png" alt=""></div>
+        </div>
+        <div class="slide-num">4</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 4" style="--plate-color: #2c4a6b;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">04 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">Women High Rise 90s Slim Straight Jeans</span>
+      <span class="t plate-color">Color Medium Wash</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s04/image8.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s04/image7.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s04/image6.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s04/image9.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="5" data-slide="5">
+<section class="deck-slide" id="slide-05" data-slide="5" aria-labelledby="slide-05-title">
+  <div class="sr-only"><h2 id="slide-05-title">Slide 5 — Women High Rise 90s Slim Straight Jeans, Color Medium Wash</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s05/image5.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 40.266%; top: 22.508%; width: 26.163%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s05/image10.png" alt=""></div>
+          <div class="pp" style="left: 1.924%; top: 22.508%; width: 19.803%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s05/image11.png" alt=""></div>
+          <div class="pp" style="left: 67.412%; top: 22.508%; width: 31.662%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s05/image9.png" alt=""></div>
+          <div class="pp" style="left: 22.710%; top: 22.508%; width: 16.572%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s05/image12.png" alt=""></div>
+        </div>
+        <div class="slide-num">5</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 5" style="--plate-color: #2c4a6b;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">05 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">Women High Rise 90s Slim Straight Jeans</span>
+      <span class="t plate-color">Color Medium Wash</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s05/image11.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s05/image12.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s05/image10.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s05/image9.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="6" data-slide="6">
+<section class="deck-slide" id="slide-06" data-slide="6" aria-labelledby="slide-06-title">
+  <div class="sr-only"><h2 id="slide-06-title">Slide 6 — Women High Rise 90s Slim Straight Jeans, Color Medium Wash</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s06/image5.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 72.694%; top: 22.508%; width: 26.163%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s06/image10.png" alt=""></div>
+          <div class="pp" style="left: -37.238%; top: 30.563%; width: 19.803%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s06/image11.png" alt=""></div>
+          <div class="pp" style="left: 29.916%; top: 22.542%; width: 41.690%; height: 75.097%;"><img src="https://media.globalimaige.com/shared/gap/plates/s06/image9.png" alt=""></div>
+          <div class="pp" style="left: 1.032%; top: 22.508%; width: 27.796%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s06/image12.png" alt=""></div>
+        </div>
+        <div class="slide-num">6</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 6" style="--plate-color: #2c4a6b;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">06 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">Women High Rise 90s Slim Straight Jeans</span>
+      <span class="t plate-color">Color Medium Wash</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s06/image11.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s06/image12.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s06/image9.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s06/image10.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="7" data-slide="7">
+<section class="deck-slide" id="slide-07" data-slide="7" aria-labelledby="slide-07-title">
+  <div class="sr-only"><h2 id="slide-07-title">Slide 7 — Women High Rise 90s Slim Straight Jeans, Color Light Indigo Blue</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s07/image13.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 42.417%; top: 22.508%; width: 17.431%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s07/image14.png" alt=""></div>
+          <div class="pp" style="left: 21.421%; top: 22.508%; width: 19.803%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s07/image15.png" alt=""></div>
+          <div class="pp" style="left: 1.681%; top: 22.508%; width: 18.595%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s07/image16.png" alt=""></div>
+          <div class="pp" style="left: 61.041%; top: 22.508%; width: 37.109%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s07/image17.png" alt=""></div>
+        </div>
+        <div class="slide-num">7</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 7" style="--plate-color: #88a4c4;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">07 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">Women High Rise 90s Slim Straight Jeans</span>
+      <span class="t plate-color">Color Light Indigo Blue</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s07/image16.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s07/image15.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s07/image14.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s07/image17.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="8" data-slide="8">
+<section class="deck-slide" id="slide-08" data-slide="8" aria-labelledby="slide-08-title">
+  <div class="sr-only"><h2 id="slide-08-title">Slide 8 — Women High Rise 90s Slim Straight Jeans, Color Light Indigo Blue</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s08/image13.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 1.804%; top: 22.047%; width: 28.937%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s08/image18.png" alt=""></div>
+          <div class="pp" style="left: 31.570%; top: 22.047%; width: 36.859%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s08/image19.png" alt=""></div>
+          <div class="pp" style="left: 69.259%; top: 22.047%; width: 28.937%; height: 76.280%;"><img src="https://media.globalimaige.com/shared/gap/plates/s08/image20.png" alt=""></div>
+        </div>
+        <div class="slide-num">8</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 8" style="--plate-color: #88a4c4;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">08 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">Women High Rise 90s Slim Straight Jeans</span>
+      <span class="t plate-color">Color Light Indigo Blue</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s08/image18.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s08/image19.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s08/image20.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="9" data-slide="9">
+<section class="deck-slide" id="slide-09" data-slide="9" aria-labelledby="slide-09-title">
+  <div class="sr-only"><h2 id="slide-09-title">Slide 9 — Women High Rise 90s Slim Straight Jeans, Color Light Indigo Acid</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s09/image21.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 1.289%; top: 22.851%; width: 23.320%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s09/image22.png" alt=""></div>
+          <div class="pp" style="left: 25.898%; top: 22.851%; width: 39.277%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s09/image23.png" alt=""></div>
+          <div class="pp" style="left: 66.139%; top: 22.851%; width: 32.572%; height: 75.475%;"><img src="https://media.globalimaige.com/shared/gap/plates/s09/image24.png" alt=""></div>
+        </div>
+        <div class="slide-num">9</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 9" style="--plate-color: #c2b89c;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">09 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">Women High Rise 90s Slim Straight Jeans</span>
+      <span class="t plate-color">Color Light Indigo Acid</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s09/image22.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s09/image23.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s09/image24.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="10" data-slide="10">
+<section class="deck-slide" id="slide-10" data-slide="10" aria-labelledby="slide-10-title">
+  <div class="sr-only"><h2 id="slide-10-title">Slide 10 — Women High Rise 90s Slim Straight Jeans, Color Light Indigo Acid</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s10/image21.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 1.172%; top: 22.851%; width: 20.859%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s10/image25.png" alt=""></div>
+          <div class="pp" style="left: 23.203%; top: 22.851%; width: 26.484%; height: 75.475%;"><img src="https://media.globalimaige.com/shared/gap/plates/s10/image26.png" alt=""></div>
+          <div class="pp" style="left: 50.859%; top: 22.851%; width: 47.969%; height: 75.475%;"><img src="https://media.globalimaige.com/shared/gap/plates/s10/image27.png" alt=""></div>
+        </div>
+        <div class="slide-num">10</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 10" style="--plate-color: #c2b89c;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">10 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">Women High Rise 90s Slim Straight Jeans</span>
+      <span class="t plate-color">Color Light Indigo Acid</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s10/image25.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s10/image26.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s10/image27.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="11" data-slide="11">
+<section class="deck-slide vp" id="slide-11" data-slide="11" aria-labelledby="slide-11-title">
+  <div class="sr-only"><h2 id="slide-11-title">Slide 11</h2><p>Women High Rise 90s Slim Straight Jeans. Product on model video. Concept One.</p></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas">
+        <img class="vp-slide-bg" src="https://media.globalimaige.com/shared/gap/s11/image28.png" alt="" draggable="false">
+        <img class="vp-tpl-logo" src="https://media.globalimaige.com/shared/gap/s11/image2.png" alt="" draggable="false">
+        <div class="L">
+          <span class="t eyebrow">STUDIO SHOT</span>
+          <span class="t kicker">Candid variations</span>
+        </div>
+        
+        <div class="video-panel">
+          <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s11/image29.png" alt="" draggable="false">
+          <video preload="metadata" muted autoplay playsinline
+                 poster="https://media.globalimaige.com/shared/gap/s11/image29.png" src="https://media.globalimaige.com/shared/gap/s11/media1.mp4"></video>
+          <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+        </div>
+        <div class="slide-num">11</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view vp" aria-label="Mobile layout for slide 11">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">11 / 30</span></header>
+    <div class="m-topgrad"></div>
+    <div class="m-copy">
+      <p class="m-product">Women High Rise 90s Slim Straight Jeans</p>
+      <img class="m-wordmark" src="https://media.globalimaige.com/shared/gap/brand/gap_wordmark_s01.png" alt="GAP">
+      <div class="m-tagline">PRODUCT<br>ON MODEL<br>VIDEO</div>
+      <span class="m-chip">Concept One</span>
+      
+    </div>
+    <div class="m-video">
+      <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s11/image29.png" alt="" draggable="false">
+      <video preload="metadata" muted autoplay playsinline
+             poster="https://media.globalimaige.com/shared/gap/s11/image29.png" src="https://media.globalimaige.com/shared/gap/s11/media1.mp4"></video>
+      <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="12" data-slide="12">
+<section class="deck-slide vp" id="slide-12" data-slide="12" aria-labelledby="slide-12-title">
+  <div class="sr-only"><h2 id="slide-12-title">Slide 12</h2><p>Women High Rise 90s Slim Straight Jeans. Product on model video. Concept Two.</p></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas">
+        <img class="vp-slide-bg" src="https://media.globalimaige.com/shared/gap/s12/image30.png" alt="" draggable="false">
+        <img class="vp-tpl-logo" src="https://media.globalimaige.com/shared/gap/s12/image2.png" alt="" draggable="false">
+        <div class="L">
+          <span class="t eyebrow">SIDEWALK OUTDOOR SHOT</span>
+          <span class="t kicker">Different city vibes</span>
+        </div>
+        
+        <div class="video-panel">
+          <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s12/image31.png" alt="" draggable="false">
+          <video preload="metadata" muted autoplay playsinline
+                 poster="https://media.globalimaige.com/shared/gap/s12/image31.png" src="https://media.globalimaige.com/shared/gap/s12/media2.mp4"></video>
+          <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+        </div>
+        <div class="slide-num">12</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view vp" aria-label="Mobile layout for slide 12">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">12 / 30</span></header>
+    <div class="m-topgrad"></div>
+    <div class="m-copy">
+      <p class="m-product">Women High Rise 90s Slim Straight Jeans</p>
+      <img class="m-wordmark" src="https://media.globalimaige.com/shared/gap/brand/gap_wordmark_s01.png" alt="GAP">
+      <div class="m-tagline">PRODUCT<br>ON MODEL<br>VIDEO</div>
+      <span class="m-chip">Concept Two</span>
+      
+    </div>
+    <div class="m-video">
+      <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s12/image31.png" alt="" draggable="false">
+      <video preload="metadata" muted autoplay playsinline
+             poster="https://media.globalimaige.com/shared/gap/s12/image31.png" src="https://media.globalimaige.com/shared/gap/s12/media2.mp4"></video>
+      <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-simple-reflow" data-editor-slide="13" data-slide="13">
+<section class="deck-slide" id="slide-13" data-slide="13" aria-labelledby="slide-13-title">
+  <div class="sr-only"><h2 id="slide-13-title">Slide 13 — MEN'S SWEATSHIRTS</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s13/image32.png" alt="" draggable="false">
+        <div class="slide-num">13</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate simple-reflow product" aria-label="Mobile layout for slide 13">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">13 / 30</span></header>
+    <div class="m-header L">
+      <img class="m-wordmark" src="https://media.globalimaige.com/shared/gap/brand/gap_wordmark_s01.png" alt="GAP" style="margin-bottom:6px;">
+      <span class="t plate-title">MEN'S SWEATSHIRTS</span>
+      <span class="t plate-subtitle">Heavyweight Oversized Hoodie</span>
+      <div class="plate-colors">
+        <span class="t plate-color-label" style="color:#7a6a3a;">Color Army Jacket Green</span>
+        <span class="t plate-color-label" style="color:#d99a1d;">Color Rugby Gold</span>
+        <span class="t plate-color-label" style="color:#1a1a1a;">Color Black</span>
+      </div>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s13/_hoodie1.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s13/_hoodie2.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s13/_hoodie3.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-simple-reflow" data-editor-slide="14" data-slide="14">
+<section class="deck-slide" id="slide-14" data-slide="14" aria-labelledby="slide-14-title">
+  <div class="sr-only"><h2 id="slide-14-title">Slide 14 — MALE TALENT ARCHETYPES</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s14/image33.png" alt="" draggable="false">
+        <div class="slide-num">14</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate simple-reflow faces" aria-label="Mobile layout for slide 14">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">14 / 30</span></header>
+    <div class="m-header L">
+      <img class="m-wordmark" src="https://media.globalimaige.com/shared/gap/brand/gap_wordmark_s01.png" alt="GAP" style="margin-bottom:6px;">
+      <span class="t plate-title">MALE TALENT ARCHETYPES</span>
+      <span class="t plate-body">Everyday men, approachable, casual, progressive, diversity, not a jock type, easy going but not laid back, focused but friendly</span>
+    </div>
+    <div class="m-faces">
+      <div class="m-face"><img src="https://media.globalimaige.com/shared/gap/plates/s14/_face1.png" alt=""></div>
+      <div class="m-face"><img src="https://media.globalimaige.com/shared/gap/plates/s14/_face2.png" alt=""></div>
+      <div class="m-face"><img src="https://media.globalimaige.com/shared/gap/plates/s14/_face3.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="15" data-slide="15">
+<section class="deck-slide" id="slide-15" data-slide="15" aria-labelledby="slide-15-title">
+  <div class="sr-only"><h2 id="slide-15-title">Slide 15 — MEN'S SWEATSHIRTS, Color Army Jacket Green</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s15/image34.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 1.615%; top: 22.042%; width: 30.839%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s15/image35.png" alt=""></div>
+          <div class="pp" style="left: 33.547%; top: 22.042%; width: 24.942%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s15/image36.png" alt=""></div>
+          <div class="pp" style="left: 59.580%; top: 22.042%; width: 38.805%; height: 75.131%;"><img src="https://media.globalimaige.com/shared/gap/plates/s15/image37.png" alt=""></div>
+        </div>
+        <div class="slide-num">15</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 15" style="--plate-color: #7a6a3a;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">15 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">MEN'S SWEATSHIRTS</span>
+      <span class="t plate-color">Color Army Jacket Green</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s15/image35.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s15/image36.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s15/image37.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="16" data-slide="16">
+<section class="deck-slide" id="slide-16" data-slide="16" aria-labelledby="slide-16-title">
+  <div class="sr-only"><h2 id="slide-16-title">Slide 16 — MEN'S SWEATSHIRTS, Color Army Jacket Green</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s16/image34.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 1.918%; top: 22.946%; width: 30.420%; height: 74.109%;"><img src="https://media.globalimaige.com/shared/gap/plates/s16/image38.png" alt=""></div>
+          <div class="pp" style="left: 33.500%; top: 22.946%; width: 27.314%; height: 74.109%;"><img src="https://media.globalimaige.com/shared/gap/plates/s16/image39.png" alt=""></div>
+          <div class="pp" style="left: 61.976%; top: 22.946%; width: 36.105%; height: 75.280%;"><img src="https://media.globalimaige.com/shared/gap/plates/s16/image37.png" alt=""></div>
+        </div>
+        <div class="slide-num">16</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 16" style="--plate-color: #7a6a3a;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">16 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">MEN'S SWEATSHIRTS</span>
+      <span class="t plate-color">Color Army Jacket Green</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s16/image38.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s16/image39.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s16/image37.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="17" data-slide="17">
+<section class="deck-slide" id="slide-17" data-slide="17" aria-labelledby="slide-17-title">
+  <div class="sr-only"><h2 id="slide-17-title">Slide 17 — MEN'S SWEATSHIRTS, Color Rugby Gold</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s17/image40.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 1.817%; top: 23.566%; width: 41.163%; height: 73.178%;"><img src="https://media.globalimaige.com/shared/gap/plates/s17/image41.png" alt=""></div>
+          <div class="pp" style="left: 44.797%; top: 23.566%; width: 53.333%; height: 73.842%;"><img src="https://media.globalimaige.com/shared/gap/plates/s17/image42.png" alt=""></div>
+        </div>
+        <div class="slide-num">17</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 17" style="--plate-color: #d99a1d;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">17 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">MEN'S SWEATSHIRTS</span>
+      <span class="t plate-color">Color Rugby Gold</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s17/image41.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s17/image42.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="18" data-slide="18">
+<section class="deck-slide" id="slide-18" data-slide="18" aria-labelledby="slide-18-title">
+  <div class="sr-only"><h2 id="slide-18-title">Slide 18 — MEN'S SWEATSHIRTS, Color Rugby Gold</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s18/image40.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 1.817%; top: 23.566%; width: 41.163%; height: 73.178%;"><img src="https://media.globalimaige.com/shared/gap/plates/s18/image43.png" alt=""></div>
+          <div class="pp" style="left: 44.797%; top: 23.566%; width: 53.333%; height: 73.842%;"><img src="https://media.globalimaige.com/shared/gap/plates/s18/image44.png" alt=""></div>
+        </div>
+        <div class="slide-num">18</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 18" style="--plate-color: #d99a1d;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">18 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">MEN'S SWEATSHIRTS</span>
+      <span class="t plate-color">Color Rugby Gold</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s18/image43.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s18/image44.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="19" data-slide="19">
+<section class="deck-slide" id="slide-19" data-slide="19" aria-labelledby="slide-19-title">
+  <div class="sr-only"><h2 id="slide-19-title">Slide 19 — MEN'S SWEATSHIRTS, Color Black</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s19/image45.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 1.709%; top: 23.508%; width: 41.198%; height: 73.241%;"><img src="https://media.globalimaige.com/shared/gap/plates/s19/image46.png" alt=""></div>
+          <div class="pp" style="left: 43.744%; top: 23.314%; width: 20.398%; height: 73.434%;"><img src="https://media.globalimaige.com/shared/gap/plates/s19/image47.png" alt=""></div>
+          <div class="pp" style="left: 64.979%; top: 23.314%; width: 33.312%; height: 73.434%;"><img src="https://media.globalimaige.com/shared/gap/plates/s19/image48.png" alt=""></div>
+        </div>
+        <div class="slide-num">19</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 19" style="--plate-color: #1a1a1a;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">19 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">MEN'S SWEATSHIRTS</span>
+      <span class="t plate-color">Color Black</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s19/image46.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s19/image47.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s19/image48.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-composition" data-editor-slide="20" data-slide="20">
+<section class="deck-slide" id="slide-20" data-slide="20" aria-labelledby="slide-20-title">
+  <div class="sr-only"><h2 id="slide-20-title">Slide 20 — MEN'S SWEATSHIRTS, Color Black</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s20/image45.png" alt="" draggable="false">
+        <div class="photos" aria-hidden="true">
+          <div class="pp" style="left: 1.880%; top: 21.817%; width: 53.333%; height: 73.997%;"><img src="https://media.globalimaige.com/shared/gap/plates/s20/image49.png" alt=""></div>
+          <div class="pp" style="left: 56.570%; top: 21.817%; width: 41.623%; height: 73.997%;"><img src="https://media.globalimaige.com/shared/gap/plates/s20/image50.png" alt=""></div>
+        </div>
+        <div class="slide-num">20</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate composition" aria-label="Mobile layout for slide 20" style="--plate-color: #1a1a1a;">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">20 / 30</span></header>
+    <div class="m-header L">
+      <span class="t plate-title">MEN'S SWEATSHIRTS</span>
+      <span class="t plate-color">Color Black</span>
+    </div>
+    <div class="m-photos">
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s20/image49.png" alt=""></div>
+      <div class="m-photo"><img src="https://media.globalimaige.com/shared/gap/plates/s20/image50.png" alt=""></div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="21" data-slide="21">
+<section class="deck-slide vp" id="slide-21" data-slide="21" aria-labelledby="slide-21-title">
+  <div class="sr-only"><h2 id="slide-21-title">Slide 21</h2><p>Heavyweight Oversized Hoodie. Product on model video. Colorways – Splash.</p></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas">
+        <img class="vp-slide-bg" src="https://media.globalimaige.com/shared/gap/s21/image51.png" alt="" draggable="false">
+        <img class="vp-tpl-logo" src="https://media.globalimaige.com/shared/gap/s21/image2.png" alt="" draggable="false">
+        <div class="L">
+          <span class="t eyebrow">STUDIO SHOT</span>
+          <span class="t kicker">Colorways - Splash</span>
+        </div>
+        
+        <div class="video-panel">
+          <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s21/image52.png" alt="" draggable="false">
+          <video preload="metadata" muted autoplay playsinline
+                 poster="https://media.globalimaige.com/shared/gap/s21/image52.png" src="https://media.globalimaige.com/shared/gap/s21/media3.mp4"></video>
+          <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+        </div>
+        <div class="slide-num">21</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view vp" aria-label="Mobile layout for slide 21">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">21 / 30</span></header>
+    <div class="m-topgrad"></div>
+    <div class="m-copy">
+      <p class="m-product">Heavyweight Oversized Hoodie</p>
+      <img class="m-wordmark" src="https://media.globalimaige.com/shared/gap/brand/gap_wordmark_s01.png" alt="GAP">
+      <div class="m-tagline">PRODUCT<br>ON MODEL<br>VIDEO</div>
+      <span class="m-chip">Concept One</span>
+      
+    </div>
+    <div class="m-video">
+      <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s21/image52.png" alt="" draggable="false">
+      <video preload="metadata" muted autoplay playsinline
+             poster="https://media.globalimaige.com/shared/gap/s21/image52.png" src="https://media.globalimaige.com/shared/gap/s21/media3.mp4"></video>
+      <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="22" data-slide="22">
+<section class="deck-slide vp" id="slide-22" data-slide="22" aria-labelledby="slide-22-title">
+  <div class="sr-only"><h2 id="slide-22-title">Slide 22</h2><p>Heavyweight Oversized Hoodie. Product on model video. Pair up with Hoodie.</p></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas">
+        <img class="vp-slide-bg" src="https://media.globalimaige.com/shared/gap/s22/image53.png" alt="" draggable="false">
+        <img class="vp-tpl-logo" src="https://media.globalimaige.com/shared/gap/s22/image2.png" alt="" draggable="false">
+        <div class="L">
+          <span class="t eyebrow">COLLECTION SHOT</span>
+          <span class="t kicker">Pair up with Hoodie</span>
+        </div>
+        <div class="product-mix" aria-hidden="true">
+          <div class="px px-55"><img src="https://media.globalimaige.com/shared/gap/s22/image55.png" alt=""></div>
+          <div class="px px-58"><img src="https://media.globalimaige.com/shared/gap/s22/image58.png" alt=""></div>
+          <div class="px px-57"><img src="https://media.globalimaige.com/shared/gap/s22/image57.png" alt=""></div>
+          <div class="px px-56"><img src="https://media.globalimaige.com/shared/gap/s22/image56.png" alt=""></div>
+        </div>
+        <div class="video-panel">
+          <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s22/image54.png" alt="" draggable="false">
+          <video preload="metadata" muted autoplay playsinline
+                 poster="https://media.globalimaige.com/shared/gap/s22/image54.png" src="https://media.globalimaige.com/shared/gap/s22/media4.mp4"></video>
+          <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+        </div>
+        <div class="slide-num">22</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view vp" aria-label="Mobile layout for slide 22">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">22 / 30</span></header>
+    <div class="m-topgrad"></div>
+    <div class="m-copy">
+      <p class="m-product">Heavyweight Oversized Hoodie</p>
+      <img class="m-wordmark" src="https://media.globalimaige.com/shared/gap/brand/gap_wordmark_s01.png" alt="GAP">
+      <div class="m-tagline">PRODUCT<br>ON MODEL<br>VIDEO</div>
+      <span class="m-chip">Concept Two</span>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0 8px;">
+        <img src="https://media.globalimaige.com/shared/gap/s22/image55.png" alt="" style="width:100%;aspect-ratio:1/1;object-fit:contain;background:#ececec;border-radius:4px;">
+        <img src="https://media.globalimaige.com/shared/gap/s22/image58.png" alt="" style="width:100%;aspect-ratio:1/1;object-fit:contain;background:#ececec;border-radius:4px;">
+        <img src="https://media.globalimaige.com/shared/gap/s22/image57.png" alt="" style="width:100%;aspect-ratio:1/1;object-fit:contain;background:#ececec;border-radius:4px;">
+        <img src="https://media.globalimaige.com/shared/gap/s22/image56.png" alt="" style="width:100%;aspect-ratio:1/1;object-fit:contain;background:#ececec;border-radius:4px;">
+      </div>
+    </div>
+    <div class="m-video">
+      <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s22/image54.png" alt="" draggable="false">
+      <video preload="metadata" muted autoplay playsinline
+             poster="https://media.globalimaige.com/shared/gap/s22/image54.png" src="https://media.globalimaige.com/shared/gap/s22/media4.mp4"></video>
+      <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="23" data-slide="23">
+<section class="deck-slide" id="slide-23" data-slide="23" aria-labelledby="slide-23-title">
+  <div class="sr-only"><h2 id="slide-23-title">Slide 23 — PRICING : STATIC</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas pricing">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <div class="top-band"></div>
+        <div class="top-band-grad"></div>
+        <div class="collage" aria-hidden="true">
+          <div class="ph ph-7"><img src="https://media.globalimaige.com/shared/gap/s23/image7.png" alt=""></div>
+          <div class="ph ph-8"><img src="https://media.globalimaige.com/shared/gap/s23/image8.png" alt=""></div>
+          <div class="ph ph-6"><img src="https://media.globalimaige.com/shared/gap/s23/image6.png" alt=""></div>
+          <div class="ph ph-9b"><img src="https://media.globalimaige.com/shared/gap/s23/image9.png" alt=""></div>
+          <div class="ph ph-60"><img src="https://media.globalimaige.com/shared/gap/s23/image60.png" alt=""></div>
+          <div class="ph ph-9a"><img src="https://media.globalimaige.com/shared/gap/s23/image9.png" alt=""></div>
+          <div class="ph ph-12"><img src="https://media.globalimaige.com/shared/gap/s23/image12.png" alt=""></div>
+          <div class="ph ph-10"><img src="https://media.globalimaige.com/shared/gap/s23/image10.png" alt=""></div>
+          <div class="ph ph-11"><img src="https://media.globalimaige.com/shared/gap/s23/image11.png" alt=""></div>
+          <div class="ph-frame" aria-hidden="true"></div>
+        </div>
+        <div class="L">
+          <span class="t hdl-1">PRICING : STATIC</span>
+          <span class="t hdl-2">PER &lsquo;SELECTED&rsquo; AI IMAGE</span>
+          <span class="t hdl-3">(FROM SET OF 10 AI IMAGES)</span>
+          <div class="ptable">
+            <div class="ptable-row ptable-head">
+              <div class="ptable-cell">BLOCK OF</div>
+              <div class="ptable-cell">PRICE</div>
+              <div class="ptable-cell">Comments</div>
+            </div>
+            <div class="ptable-row row-a">
+              <div class="ptable-cell col-block"><span class="num">1000</span><br><span class="lbl">SELECTED<br>AI IMAGES</span></div>
+              <div class="ptable-cell col-price"><span class="price">$2.99</span> / SELECTED AI IMAGE</div>
+              <div class="ptable-cell col-cmt">Block of 1000, 2000, 3000&hellip;Selected AI images up to <span class="b">10,000 Selected AI images</span></div>
+            </div>
+            <div class="ptable-row row-b">
+              <div class="ptable-cell col-block"><span class="num">10,000</span><br><span class="lbl">SELECTED<br>AI IMAGES</span></div>
+              <div class="ptable-cell col-price"><span class="price">$1.99</span> / SELECTED AI IMAGE</div>
+              <div class="ptable-cell col-cmt">Block of 10,000, 20,000, 30,000&hellip; Selected AI images up to <span class="b">100,000 Selected AI images</span></div>
+            </div>
+            <div class="ptable-row row-a">
+              <div class="ptable-cell col-block"><span class="num">100,000</span><br><span class="lbl">SELECTED<br>AI IMAGES</span></div>
+              <div class="ptable-cell col-price"><span class="price">$0.99</span> / SELECTED AI IMAGE</div>
+              <div class="ptable-cell col-cmt">Block of 100,000, 200,000, 300,000&hellip;Selected AI images up to <span class="b">1,000,000 Selected AI images</span></div>
+            </div>
+          </div>
+          <div class="footnotes"><div style="font-size:1.18cqw;line-height:1.35;"><span class="b">10 GEN AI IMAGES</span> OF MULTIPLE POSES &amp; ANGLES <span class="b">TO CHOOSE FROM</span> (<span class="b">EXAMPLE</span>: 10,000 AI IMAGES GENERATED FOR 1000 SELECTED IMAGES)</div>
+            <div style="font-size:1.18cqw;line-height:1.35;">TRY-ON CLOTHING <span class="b">CLOSE UP &amp; DETAILS</span> INCLUDED</div>
+            <div style="font-size:1.18cqw;line-height:1.35;">PRICE PER IMAGE FOR <span class="b">SELECTED IMAGE(S) ONLY</span></div></div>
+        </div>
+        <div class="slide-num">23</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view pricing" aria-label="Mobile layout for slide 23">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">23 / 30</span></header>
+    <div class="m-hero" aria-hidden="true">
+      <img src="https://media.globalimaige.com/shared/gap/s23/image6.png" alt="">
+      <img src="https://media.globalimaige.com/shared/gap/s23/image9.png" class="featured" alt="">
+      <img src="https://media.globalimaige.com/shared/gap/s23/image11.png" alt="">
+    </div>
+    <div class="m-copy L">
+      <span class="t hdl-1">PRICING : STATIC</span>
+      <span class="t hdl-2">PER &lsquo;SELECTED&rsquo; AI IMAGE</span>
+      <span class="t hdl-3">(FROM SET OF 10 AI IMAGES)</span>
+    </div>
+    <div class="m-cards" role="list"><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">1,000<span class="b-sub">Selected AI Images</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$2.99</span><span class="p-unit">/ selected AI image</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 1000, 2000, 3000&hellip; Selected AI images up to <span class="b">10,000 Selected AI images</span>
+        </div>
+      </div><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">10,000<span class="b-sub">Selected AI Images</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$1.99</span><span class="p-unit">/ selected AI image</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 10,000, 20,000, 30,000&hellip; Selected AI images up to <span class="b">100,000 Selected AI images</span>
+        </div>
+      </div><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">100,000<span class="b-sub">Selected AI Images</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$0.99</span><span class="p-unit">/ selected AI image</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 100,000, 200,000, 300,000&hellip; Selected AI images up to <span class="b">1,000,000 Selected AI images</span>
+        </div>
+      </div></div>
+    <div class="m-foot L"><div style="font-size:11px;line-height:1.4;"><span class="b">10 GEN AI IMAGES</span> of multiple poses &amp; angles <span class="b">to choose from</span></div>
+      <div style="font-size:11px;line-height:1.4;">Try-on clothing <span class="b">close up &amp; details</span> included</div>
+      <div style="font-size:11px;line-height:1.4;">Price per image for <span class="b">selected image(s) only</span></div></div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="24" data-slide="24">
+<section class="deck-slide" id="slide-24" data-slide="24" aria-labelledby="slide-24-title">
+  <div class="sr-only"><h2 id="slide-24-title">Slide 24 — PRICING : VIDEO</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas pricing">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <div class="top-band"></div>
+        <div class="top-band-grad"></div>
+        <div class="thumbs" aria-hidden="true"><div class="th row-1 col-1"><img src="https://media.globalimaige.com/shared/gap/s24/image91.png" alt=""></div><div class="th row-1 col-2"><img src="https://media.globalimaige.com/shared/gap/s24/image91.png" alt=""></div><div class="th row-1 col-3"><img src="https://media.globalimaige.com/shared/gap/s24/image92.png" alt=""></div><div class="th row-1 col-4"><img src="https://media.globalimaige.com/shared/gap/s24/image93.png" alt=""></div><div class="th row-1 col-5"><img src="https://media.globalimaige.com/shared/gap/s24/image94.png" alt=""></div><div class="th row-1 col-6"><img src="https://media.globalimaige.com/shared/gap/s24/image95.png" alt=""></div><div class="th row-2 col-1"><img src="https://media.globalimaige.com/shared/gap/s24/image61.png" alt=""></div><div class="th row-2 col-2"><img src="https://media.globalimaige.com/shared/gap/s24/image62.png" alt=""></div><div class="th row-2 col-3"><img src="https://media.globalimaige.com/shared/gap/s24/image63.png" alt=""></div><div class="th row-2 col-4"><img src="https://media.globalimaige.com/shared/gap/s24/image64.png" alt=""></div><div class="th row-2 col-5"><img src="https://media.globalimaige.com/shared/gap/s24/image65.png" alt=""></div><div class="th row-2 col-6"><img src="https://media.globalimaige.com/shared/gap/s24/image66.png" alt=""></div><div class="th row-3 col-1"><img src="https://media.globalimaige.com/shared/gap/s24/image67.png" alt=""></div><div class="th row-3 col-2"><img src="https://media.globalimaige.com/shared/gap/s24/image68.png" alt=""></div><div class="th row-3 col-3"><img src="https://media.globalimaige.com/shared/gap/s24/image69.png" alt=""></div><div class="th row-3 col-4"><img src="https://media.globalimaige.com/shared/gap/s24/image70.png" alt=""></div><div class="th row-3 col-5"><img src="https://media.globalimaige.com/shared/gap/s24/image71.png" alt=""></div><div class="th row-3 col-6"><img src="https://media.globalimaige.com/shared/gap/s24/image72.png" alt=""></div><div class="th row-4 col-1"><img src="https://media.globalimaige.com/shared/gap/s24/image73.png" alt=""></div><div class="th row-4 col-2"><img src="https://media.globalimaige.com/shared/gap/s24/image74.png" alt=""></div><div class="th row-4 col-3"><img src="https://media.globalimaige.com/shared/gap/s24/image75.png" alt=""></div><div class="th row-4 col-4"><img src="https://media.globalimaige.com/shared/gap/s24/image76.png" alt=""></div><div class="th row-4 col-5"><img src="https://media.globalimaige.com/shared/gap/s24/image77.png" alt=""></div><div class="th row-4 col-6"><img src="https://media.globalimaige.com/shared/gap/s24/image78.png" alt=""></div><div class="th row-5 col-1"><img src="https://media.globalimaige.com/shared/gap/s24/image79.png" alt=""></div><div class="th row-5 col-2"><img src="https://media.globalimaige.com/shared/gap/s24/image80.png" alt=""></div><div class="th row-5 col-3"><img src="https://media.globalimaige.com/shared/gap/s24/image81.png" alt=""></div><div class="th row-5 col-4"><img src="https://media.globalimaige.com/shared/gap/s24/image82.png" alt=""></div><div class="th row-5 col-5"><img src="https://media.globalimaige.com/shared/gap/s24/image83.png" alt=""></div><div class="th row-5 col-6"><img src="https://media.globalimaige.com/shared/gap/s24/image84.png" alt=""></div><div class="th row-6 col-1"><img src="https://media.globalimaige.com/shared/gap/s24/image85.png" alt=""></div><div class="th row-6 col-2"><img src="https://media.globalimaige.com/shared/gap/s24/image86.png" alt=""></div><div class="th row-6 col-3"><img src="https://media.globalimaige.com/shared/gap/s24/image87.png" alt=""></div><div class="th row-6 col-4"><img src="https://media.globalimaige.com/shared/gap/s24/image88.png" alt=""></div><div class="th row-6 col-5"><img src="https://media.globalimaige.com/shared/gap/s24/image89.png" alt=""></div><div class="th row-6 col-6"><img src="https://media.globalimaige.com/shared/gap/s24/image90.png" alt=""></div><div class="ph-frame" aria-hidden="true"></div></div>
+        <div class="L">
+          <span class="t hdl-1">PRICING : VIDEO</span>
+          <span class="t hdl-2">PER &lsquo;SELECTED&rsquo; VIDEO CLIP (5 Seconds)</span>
+          <span class="t hdl-3">(FROM A REEL OF 30 Second SOLID Background Video)</span>
+          <div class="ptable">
+            <div class="ptable-row ptable-head">
+              <div class="ptable-cell">BLOCK OF</div>
+              <div class="ptable-cell">PRICE</div>
+              <div class="ptable-cell">Comments</div>
+            </div>
+            <div class="ptable-row row-a">
+              <div class="ptable-cell col-block"><span class="num">100</span><br><span class="lbl">SELECTED<br>VIDEO CLIPS</span></div>
+              <div class="ptable-cell col-price"><span class="price">$3.99</span> / SELECTED VIDEO CLIP</div>
+              <div class="ptable-cell col-cmt">Block of 100, 200, 300&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">1,000 Video Clips</span></div>
+            </div>
+            <div class="ptable-row row-b">
+              <div class="ptable-cell col-block"><span class="num">1,000</span><br><span class="lbl">SELECTED<br>VIDEO CLIPS</span></div>
+              <div class="ptable-cell col-price"><span class="price">$2.99</span> / SELECTED VIDEO CLIP</div>
+              <div class="ptable-cell col-cmt">Block of 1000, 2000, 3000&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">10,000 Video Clips</span></div>
+            </div>
+            <div class="ptable-row row-a">
+              <div class="ptable-cell col-block"><span class="num">10,000</span><br><span class="lbl">SELECTED<br>VIDEO CLIPS</span></div>
+              <div class="ptable-cell col-price"><span class="price">$1.99</span> / SELECTED VIDEO CLIP</div>
+              <div class="ptable-cell col-cmt">Block of 10,000, 20,000, 30,000&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">10,000 Video Clips</span></div>
+            </div>
+          </div>
+          <div class="footnotes"><div style="font-size:1.18cqw;line-height:1.35;"><span class="b">30 SECOND VIDEO</span> CLIP &amp; REEL <span class="b">TO CHOOSE FROM</span></div>
+            <div style="font-size:1.18cqw;line-height:1.35;">ENTIRE 30 SECOND VIDEO CLIP <span class="b">WITH SOLID BACKGROUND</span></div>
+            <div style="font-size:1.18cqw;line-height:1.35;">PRICE PER VIDEO FOR <span class="b">SELECTED 5 SECOND CLIP(S) ONLY</span></div></div>
+        </div>
+        <div class="slide-num">24</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view pricing" aria-label="Mobile layout for slide 24">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">24 / 30</span></header>
+    <div class="m-hero" aria-hidden="true">
+      <img src="https://media.globalimaige.com/shared/gap/s24/image91.png" alt="">
+      <img src="https://media.globalimaige.com/shared/gap/s24/image82.png" class="featured" alt="">
+      <img src="https://media.globalimaige.com/shared/gap/s24/image88.png" alt="">
+    </div>
+    <div class="m-copy L">
+      <span class="t hdl-1">PRICING : VIDEO</span>
+      <span class="t hdl-2">PER &lsquo;SELECTED&rsquo; VIDEO CLIP (5 Seconds)</span>
+      <span class="t hdl-3">(FROM A REEL OF 30 Second SOLID Background Video)</span>
+    </div>
+    <div class="m-cards" role="list"><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">100<span class="b-sub">Selected Video Clips</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$3.99</span><span class="p-unit">/ selected video clip</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 100, 200, 300&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">1,000 Video Clips</span>
+        </div>
+      </div><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">1,000<span class="b-sub">Selected Video Clips</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$2.99</span><span class="p-unit">/ selected video clip</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 1000, 2000, 3000&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">10,000 Video Clips</span>
+        </div>
+      </div><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">10,000<span class="b-sub">Selected Video Clips</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$1.99</span><span class="p-unit">/ selected video clip</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 10,000, 20,000, 30,000&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">10,000 Video Clips</span>
+        </div>
+      </div></div>
+    <div class="m-foot L"><div style="font-size:11px;line-height:1.4;"><span class="b">30 second video</span> clip &amp; reel <span class="b">to choose from</span></div>
+      <div style="font-size:11px;line-height:1.4;">Entire 30 second video clip <span class="b">with solid background</span></div>
+      <div style="font-size:11px;line-height:1.4;">Price per video for <span class="b">selected 5 second clip(s) only</span></div></div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="25" data-slide="25">
+<section class="deck-slide" id="slide-25" data-slide="25" aria-labelledby="slide-25-title">
+  <div class="sr-only"><h2 id="slide-25-title">Slide 25 — PRICING : VIDEO</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas pricing">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <div class="top-band"></div>
+        <div class="top-band-grad"></div>
+        <div class="thumbs" aria-hidden="true"><div class="th row-1 col-1"><img src="https://media.globalimaige.com/shared/gap/s25/image105.png" alt=""></div><div class="th row-1 col-2"><img src="https://media.globalimaige.com/shared/gap/s25/image104.png" alt=""></div><div class="th row-1 col-3"><img src="https://media.globalimaige.com/shared/gap/s25/image103.png" alt=""></div><div class="th row-1 col-4"><img src="https://media.globalimaige.com/shared/gap/s25/image102.png" alt=""></div><div class="th row-1 col-5"><img src="https://media.globalimaige.com/shared/gap/s25/image101.png" alt=""></div><div class="th row-1 col-6"><img src="https://media.globalimaige.com/shared/gap/s25/image100.png" alt=""></div><div class="th row-2 col-1"><img src="https://media.globalimaige.com/shared/gap/s25/image99.png" alt=""></div><div class="th row-2 col-2"><img src="https://media.globalimaige.com/shared/gap/s25/image98.png" alt=""></div><div class="th row-2 col-3"><img src="https://media.globalimaige.com/shared/gap/s25/image97.png" alt=""></div><div class="th row-2 col-4"><img src="https://media.globalimaige.com/shared/gap/s25/image96.png" alt=""></div><div class="th row-2 col-5"><img src="https://media.globalimaige.com/shared/gap/s25/image96.png" alt=""></div><div class="th row-2 col-6"><img src="https://media.globalimaige.com/shared/gap/s25/image112.png" alt=""></div><div class="th row-3 col-1"><img src="https://media.globalimaige.com/shared/gap/s25/image111.png" alt=""></div><div class="th row-3 col-2"><img src="https://media.globalimaige.com/shared/gap/s25/image110.png" alt=""></div><div class="th row-3 col-3"><img src="https://media.globalimaige.com/shared/gap/s25/image109.png" alt=""></div><div class="th row-3 col-4"><img src="https://media.globalimaige.com/shared/gap/s25/image108.png" alt=""></div><div class="th row-3 col-5"><img src="https://media.globalimaige.com/shared/gap/s25/image107.png" alt=""></div><div class="th row-3 col-6"><img src="https://media.globalimaige.com/shared/gap/s25/image106.png" alt=""></div><div class="th row-4 col-1"><img src="https://media.globalimaige.com/shared/gap/s25/image122.png" alt=""></div><div class="th row-4 col-2"><img src="https://media.globalimaige.com/shared/gap/s25/image121.png" alt=""></div><div class="th row-4 col-3"><img src="https://media.globalimaige.com/shared/gap/s25/image120.png" alt=""></div><div class="th row-4 col-4"><img src="https://media.globalimaige.com/shared/gap/s25/image119.png" alt=""></div><div class="th row-4 col-5"><img src="https://media.globalimaige.com/shared/gap/s25/image118.png" alt=""></div><div class="th row-4 col-6"><img src="https://media.globalimaige.com/shared/gap/s25/image117.png" alt=""></div><div class="th row-5 col-1"><img src="https://media.globalimaige.com/shared/gap/s25/image116.png" alt=""></div><div class="th row-5 col-2"><img src="https://media.globalimaige.com/shared/gap/s25/image115.png" alt=""></div><div class="th row-5 col-3"><img src="https://media.globalimaige.com/shared/gap/s25/image114.png" alt=""></div><div class="th row-5 col-4"><img src="https://media.globalimaige.com/shared/gap/s25/image113.png" alt=""></div><div class="th row-5 col-5"><img src="https://media.globalimaige.com/shared/gap/s25/image113.png" alt=""></div><div class="th row-5 col-6"><img src="https://media.globalimaige.com/shared/gap/s25/image129.png" alt=""></div><div class="th row-6 col-1"><img src="https://media.globalimaige.com/shared/gap/s25/image128.png" alt=""></div><div class="th row-6 col-2"><img src="https://media.globalimaige.com/shared/gap/s25/image127.png" alt=""></div><div class="th row-6 col-3"><img src="https://media.globalimaige.com/shared/gap/s25/image126.png" alt=""></div><div class="th row-6 col-4"><img src="https://media.globalimaige.com/shared/gap/s25/image125.png" alt=""></div><div class="th row-6 col-5"><img src="https://media.globalimaige.com/shared/gap/s25/image124.png" alt=""></div><div class="th row-6 col-6"><img src="https://media.globalimaige.com/shared/gap/s25/image123.png" alt=""></div><div class="ph-frame" aria-hidden="true"></div></div>
+        <div class="L">
+          <span class="t hdl-1">PRICING : VIDEO</span>
+          <span class="t hdl-2">PER &lsquo;SELECTED&rsquo; VIDEO CLIP (5 Seconds)</span>
+          <span class="t hdl-3">(FROM A REEL OF 30 Second DYNAMIC Background Video)</span>
+          <div class="ptable">
+            <div class="ptable-row ptable-head">
+              <div class="ptable-cell">BLOCK OF</div>
+              <div class="ptable-cell">PRICE</div>
+              <div class="ptable-cell">Comments</div>
+            </div>
+            <div class="ptable-row row-a">
+              <div class="ptable-cell col-block"><span class="num">100</span><br><span class="lbl">SELECTED<br>VIDEO CLIPS</span></div>
+              <div class="ptable-cell col-price"><span class="price">$4.99</span> / SELECTED VIDEO CLIP</div>
+              <div class="ptable-cell col-cmt">Block of 100, 200, 300&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">1,000 Video Clips</span></div>
+            </div>
+            <div class="ptable-row row-b">
+              <div class="ptable-cell col-block"><span class="num">1,000</span><br><span class="lbl">SELECTED<br>VIDEO CLIPS</span></div>
+              <div class="ptable-cell col-price"><span class="price">$3.99</span> / SELECTED VIDEO CLIP</div>
+              <div class="ptable-cell col-cmt">Block of 1000, 2000, 3000&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">10,000 Video Clips</span></div>
+            </div>
+            <div class="ptable-row row-a">
+              <div class="ptable-cell col-block"><span class="num">10,000</span><br><span class="lbl">SELECTED<br>VIDEO CLIPS</span></div>
+              <div class="ptable-cell col-price"><span class="price">$2.99</span> / SELECTED VIDEO CLIP</div>
+              <div class="ptable-cell col-cmt">Block of 10,000, 20,000, 30,000&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">10,000 Video Clips</span></div>
+            </div>
+          </div>
+          <div class="footnotes"><div style="font-size:1.18cqw;line-height:1.35;"><span class="b">30 SECOND VIDEO</span> CLIP &amp; REEL <span class="b">TO CHOOSE FROM</span></div>
+            <div style="font-size:1.18cqw;line-height:1.35;">ENTIRE 30 SECOND VIDEO CLIP <span class="b">WITH DYNAMIC BACKGROUND (SET &amp; PROP)</span></div>
+            <div style="font-size:1.18cqw;line-height:1.35;">PRICE PER VIDEO FOR <span class="b">SELECTED 5 SECOND CLIP(S) ONLY</span></div></div>
+        </div>
+        <div class="slide-num">25</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view pricing" aria-label="Mobile layout for slide 25">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">25 / 30</span></header>
+    <div class="m-hero" aria-hidden="true">
+      <img src="https://media.globalimaige.com/shared/gap/s25/image102.png" alt="">
+      <img src="https://media.globalimaige.com/shared/gap/s25/image108.png" class="featured" alt="">
+      <img src="https://media.globalimaige.com/shared/gap/s25/image125.png" alt="">
+    </div>
+    <div class="m-copy L">
+      <span class="t hdl-1">PRICING : VIDEO</span>
+      <span class="t hdl-2">PER &lsquo;SELECTED&rsquo; VIDEO CLIP (5 Seconds)</span>
+      <span class="t hdl-3">(FROM A REEL OF 30 Second DYNAMIC Background Video)</span>
+    </div>
+    <div class="m-cards" role="list"><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">100<span class="b-sub">Selected Video Clips</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$4.99</span><span class="p-unit">/ selected video clip</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 100, 200, 300&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">1,000 Video Clips</span>
+        </div>
+      </div><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">1,000<span class="b-sub">Selected Video Clips</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$3.99</span><span class="p-unit">/ selected video clip</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 1000, 2000, 3000&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">10,000 Video Clips</span>
+        </div>
+      </div><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">10,000<span class="b-sub">Selected Video Clips</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$2.99</span><span class="p-unit">/ selected video clip</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 10,000, 20,000, 30,000&hellip; Selected 5 Sec Clips from 30 sec reels up to <span class="b">10,000 Video Clips</span>
+        </div>
+      </div></div>
+    <div class="m-foot L"><div style="font-size:11px;line-height:1.4;"><span class="b">30 second video</span> clip &amp; reel <span class="b">to choose from</span></div>
+      <div style="font-size:11px;line-height:1.4;">Entire 30 second video clip <span class="b">with dynamic background (set &amp; prop)</span></div>
+      <div style="font-size:11px;line-height:1.4;">Price per video for <span class="b">selected 5 second clip(s) only</span></div></div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="26" data-slide="26">
+<section class="deck-slide" id="slide-26" data-slide="26" aria-labelledby="slide-26-title">
+  <div class="sr-only"><h2 id="slide-26-title">Slide 26 — PRICING : TALENT</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas pricing">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <div class="top-band"></div>
+        <div class="top-band-grad"></div>
+        <div class="faces" aria-hidden="true">
+          <div class="face face-131"><img src="https://media.globalimaige.com/shared/gap/s26/image131.png" alt=""></div>
+          <div class="face face-133"><img src="https://media.globalimaige.com/shared/gap/s26/image133.png" alt=""></div>
+          <div class="face face-135"><img src="https://media.globalimaige.com/shared/gap/s26/image135.png" alt=""></div>
+          <div class="face face-132"><img src="https://media.globalimaige.com/shared/gap/s26/image132.png" alt=""></div>
+          <div class="face face-134"><img src="https://media.globalimaige.com/shared/gap/s26/image134.png" alt=""></div>
+          <div class="face face-136"><img src="https://media.globalimaige.com/shared/gap/s26/image136.png" alt=""></div>
+          <div class="face face-130"><img src="https://media.globalimaige.com/shared/gap/s26/image130.png" alt=""></div>
+          <div class="ph-frame" aria-hidden="true"></div>
+        </div>
+        <div class="L">
+          <span class="t hdl-1">PRICING : TALENT</span>
+          <span class="t hdl-2">PER &lsquo;SELECTED&rsquo; MODEL TALENT</span>
+          <span class="t hdl-3">(FROM SET OF 10 OPTIONS PER MODEL ARCHETYPE)</span>
+          <div class="ptable">
+            <div class="ptable-row ptable-head">
+              <div class="ptable-cell">BLOCK OF</div>
+              <div class="ptable-cell">PRICE</div>
+              <div class="ptable-cell">Comments</div>
+            </div>
+            <div class="ptable-row row-a">
+              <div class="ptable-cell col-block"><span class="num">10</span><br><span class="lbl">SELECTED<br>AI MODELS</span></div>
+              <div class="ptable-cell col-price"><span class="price">$19.99</span> / SELECTED AI TALENT</div>
+              <div class="ptable-cell col-cmt">Block of 10, 20, 30&hellip; Selected AI Models up to <span class="b">100 Selected Talent Models</span></div>
+            </div>
+            <div class="ptable-row row-b">
+              <div class="ptable-cell col-block"><span class="num">100</span><br><span class="lbl">SELECTED<br>AI MODELS</span></div>
+              <div class="ptable-cell col-price"><span class="price">$9.99</span> / SELECTED AI TALENT</div>
+              <div class="ptable-cell col-cmt">Block of 100, 200, 300&hellip; Selected AI Models up to <span class="b">1000 Selected Talent Models</span></div>
+            </div>
+            <div class="ptable-row row-a">
+              <div class="ptable-cell col-block"><span class="num">1000</span><br><span class="lbl">SELECTED<br>AI MODELS</span></div>
+              <div class="ptable-cell col-price"><span class="price">$4.99</span> / SELECTED AI TALENT</div>
+              <div class="ptable-cell col-cmt">Block of 1000, 2000, 3000&hellip; Selected AI Models up to <span class="b">10,000 Selected Talent Models</span></div>
+            </div>
+          </div>
+          <div class="footnotes"><div style="font-size:1.18cqw;line-height:1.35;"><span class="b">10 OPTIONS OF AI MODELS FOR EACH ARCHETYPE</span> TO CHOOSE FROM</div>
+            <div style="font-size:1.18cqw;line-height:1.35;">GEN AI MODELS WILL BE <span class="b">UNIQUE TO GAP</span></div>
+            <div style="font-size:1.18cqw;line-height:1.35;">PRICE PER MODEL WOULD BE <span class="b">A ONE TIME COST</span></div></div>
+        </div>
+        <div class="slide-num">26</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view pricing" aria-label="Mobile layout for slide 26">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">26 / 30</span></header>
+    <div class="m-hero" aria-hidden="true">
+      <img src="https://media.globalimaige.com/shared/gap/s26/image131.png" alt="">
+      <img src="https://media.globalimaige.com/shared/gap/s26/image132.png" class="featured" alt="">
+      <img src="https://media.globalimaige.com/shared/gap/s26/image134.png" alt="">
+    </div>
+    <div class="m-copy L">
+      <span class="t hdl-1">PRICING : TALENT</span>
+      <span class="t hdl-2">PER &lsquo;SELECTED&rsquo; MODEL TALENT</span>
+      <span class="t hdl-3">(FROM SET OF 10 OPTIONS PER MODEL ARCHETYPE)</span>
+    </div>
+    <div class="m-cards" role="list"><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">10<span class="b-sub">Selected AI Models</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$19.99</span><span class="p-unit">/ selected AI talent</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 10, 20, 30&hellip; Selected AI Models up to <span class="b">100 Selected Talent Models</span>
+        </div>
+      </div><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">100<span class="b-sub">Selected AI Models</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$9.99</span><span class="p-unit">/ selected AI talent</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 100, 200, 300&hellip; Selected AI Models up to <span class="b">1,000 Selected Talent Models</span>
+        </div>
+      </div><div class="m-card" role="listitem">
+        <span class="m-card-label">Block of</span>
+        <div class="m-card-block">1,000<span class="b-sub">Selected AI Models</span></div>
+        <div class="m-card-price">
+          <span class="m-card-label" style="margin-bottom:0;margin-right:6px;">Price</span>
+          <span class="p-amt">$4.99</span><span class="p-unit">/ selected AI talent</span>
+        </div>
+        <div class="m-card-comment">
+          <span class="m-card-label">Comments</span>
+          Block of 1000, 2000, 3000&hellip; Selected AI Models up to <span class="b">10,000 Selected Talent Models</span>
+        </div>
+      </div></div>
+    <div class="m-foot L"><div style="font-size:11px;line-height:1.4;"><span class="b">10 options of AI models for each archetype</span> to choose from</div>
+      <div style="font-size:11px;line-height:1.4;">Gen AI models will be <span class="b">unique to GAP</span></div>
+      <div style="font-size:11px;line-height:1.4;">Price per model would be <span class="b">a one time cost</span></div></div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="27" data-slide="27">
+<section class="deck-slide" id="slide-27" data-slide="27" aria-labelledby="slide-27-title">
+  <div class="sr-only"><h2 id="slide-27-title">Slide 27 — Pricing Model (Per Block)</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas">
+        <div class="top-band"></div>
+        <div class="top-band-grad"></div>
+        <div class="L">
+          <div class="logo"><img src="https://media.globalimaige.com/shared/gap/s27/image91.png" alt=""></div>
+          <span class="t">PRICING MODEL (PER BLOCK)</span>
+        </div>
+        <div class="ptable tbl-1" role="table">
+          <div class="ptable-row ptable-head">
+            <div class="ptable-cell col-label">Selected AI Images</div>
+            <div class="ptable-cell col-label">Block of 1000 Images</div>
+            <div class="ptable-cell col-label">Block of 10,000 Images</div>
+            <div class="ptable-cell col-label">Block of 100,000 Images</div>
+          </div>
+          <div class="ptable-row">
+            <div class="ptable-cell col-label"><span class="row-label">Price per Image</span></div>
+            <div class="ptable-cell col-val"><span class="price">$2.99</span></div>
+            <div class="ptable-cell col-val"><span class="price">$1.99</span></div>
+            <div class="ptable-cell col-val"><span class="price">$0.99</span></div>
+          </div>
+        </div>
+        <div class="ptable tbl-2" role="table">
+          <div class="ptable-row ptable-head">
+            <div class="ptable-cell col-label">Selected AI Video &ndash; 5s</div>
+            <div class="ptable-cell col-label">Block of 100 Videos</div>
+            <div class="ptable-cell col-label">Block of 1000 Videos</div>
+            <div class="ptable-cell col-label">Block of 10,000 Videos</div>
+          </div>
+          <div class="ptable-row">
+            <div class="ptable-cell col-label"><span class="row-label">Price per AI Video</span></div>
+            <div class="ptable-cell col-val"><span class="price">$3.99</span></div>
+            <div class="ptable-cell col-val"><span class="price">$2.99</span></div>
+            <div class="ptable-cell col-val"><span class="price">$1.99</span></div>
+          </div>
+        </div>
+        <div class="ptable tbl-3" role="table">
+          <div class="ptable-row ptable-head">
+            <div class="ptable-cell col-label">Selected AI Talent Model</div>
+            <div class="ptable-cell col-label">Block of 10 Models</div>
+            <div class="ptable-cell col-label">Block of 100 Models</div>
+            <div class="ptable-cell col-label">Block of 1000 Models</div>
+          </div>
+          <div class="ptable-row">
+            <div class="ptable-cell col-label"><span class="row-label">Price per Model</span></div>
+            <div class="ptable-cell col-val"><span class="price">$19.99</span></div>
+            <div class="ptable-cell col-val"><span class="price">$9.99</span></div>
+            <div class="ptable-cell col-val"><span class="price">$4.99</span></div>
+          </div>
+        </div>
+        <div class="slide-num">27</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view pricing-27" aria-label="Mobile layout for slide 27">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">27 / 30</span></header>
+    <div class="m-title L">
+      <div class="logo"><img src="https://media.globalimaige.com/shared/gap/s27/image91.png" alt=""></div>
+      <span class="t">PRICING MODEL (PER BLOCK)</span>
+    </div>
+    <div class="m-sections">
+      <section class="m-sec">
+        <header class="m-sec-head">
+          <div class="m-sec-cat">Selected AI Images</div>
+          <span class="m-sec-sub">Price per image</span>
+        </header>
+        <div class="m-sec-row"><span class="lbl">Block of 1,000 Images</span><span class="val">$2.99<span class="unit">/ image</span></span></div>
+        <div class="m-sec-row"><span class="lbl">Block of 10,000 Images</span><span class="val">$1.99<span class="unit">/ image</span></span></div>
+        <div class="m-sec-row"><span class="lbl">Block of 100,000 Images</span><span class="val">$0.99<span class="unit">/ image</span></span></div>
+      </section>
+      <section class="m-sec">
+        <header class="m-sec-head">
+          <div class="m-sec-cat">Selected AI Video &ndash; 5s</div>
+          <span class="m-sec-sub">Price per AI video</span>
+        </header>
+        <div class="m-sec-row"><span class="lbl">Block of 100 Videos</span><span class="val">$3.99<span class="unit">/ video</span></span></div>
+        <div class="m-sec-row"><span class="lbl">Block of 1,000 Videos</span><span class="val">$2.99<span class="unit">/ video</span></span></div>
+        <div class="m-sec-row"><span class="lbl">Block of 10,000 Videos</span><span class="val">$1.99<span class="unit">/ video</span></span></div>
+      </section>
+      <section class="m-sec">
+        <header class="m-sec-head">
+          <div class="m-sec-cat">Selected AI Talent Model</div>
+          <span class="m-sec-sub">Price per model</span>
+        </header>
+        <div class="m-sec-row"><span class="lbl">Block of 10 Models</span><span class="val">$19.99<span class="unit">/ model</span></span></div>
+        <div class="m-sec-row"><span class="lbl">Block of 100 Models</span><span class="val">$9.99<span class="unit">/ model</span></span></div>
+        <div class="m-sec-row"><span class="lbl">Block of 1,000 Models</span><span class="val">$4.99<span class="unit">/ model</span></span></div>
+      </section>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-simple-reflow" data-editor-slide="28" data-slide="28">
+<section class="deck-slide" id="slide-28" data-slide="28" aria-labelledby="slide-28-title">
+  <div class="sr-only"><h2 id="slide-28-title">Slide 28 — OUR WORKFLOW</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s28/image137.png" alt="" draggable="false">
+        <div class="slide-num">28</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate simple-reflow diagram" aria-label="Mobile layout for slide 28">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">28 / 30</span></header>
+    <div class="m-diagram-body">
+      <div class="m-header L">
+        <span class="t plate-title">OUR WORKFLOW</span>
+      </div>
+      <div class="m-imagery">
+        <img src="https://media.globalimaige.com/shared/gap/plates/s28/_diagram.png" alt="">
+      </div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group plate-simple-reflow" data-editor-slide="29" data-slide="29">
+<section class="deck-slide" id="slide-29" data-slide="29" aria-labelledby="slide-29-title">
+  <div class="sr-only"><h2 id="slide-29-title">Slide 29 — AI-ART CREATIVE PROCESS</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas plate">
+        <img class="tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt="" draggable="false">
+        <img class="plate-bg" src="https://media.globalimaige.com/shared/gap/plates/s29/image138.png" alt="" draggable="false">
+        <div class="slide-num">29</div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view plate simple-reflow diagram" aria-label="Mobile layout for slide 29">
+    <header class="m-topbar"><span class="m-brand">GAP <span style="opacity:0.6">|</span> AI</span><img class="m-tpl-logo" src="https://media.globalimaige.com/shared/gap/brand/gif_logo.png" alt=""><span class="m-count">29 / 30</span></header>
+    <div class="m-diagram-body">
+      <div class="m-header L">
+        <span class="t plate-title">AI-ART CREATIVE PROCESS</span>
+      </div>
+      <div class="m-imagery">
+        <img src="https://media.globalimaige.com/shared/gap/plates/s29/_diagram.png" alt="">
+      </div>
+    </div>
+  </article>
+</section>
+</div>
+<div class="slide editor-slide-group" data-editor-slide="30" data-slide="30">
+<section class="deck-slide" id="slide-30" data-slide="30" aria-labelledby="slide-30-title">
+  <div class="sr-only"><h2 id="slide-30-title">Slide 30 — Outro</h2></div>
+  <div class="desktop-view" aria-hidden="true">
+    <div class="stage">
+      <div class="canvas">
+        <div class="video-fill">
+          <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s30/image139.png" alt="" draggable="false">
+          <video preload="auto" muted autoplay playsinline
+                 poster="https://media.globalimaige.com/shared/gap/s30/image139.png" src="https://media.globalimaige.com/shared/gap/s30/media5.mp4"></video>
+          <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <article class="mobile-view outro" aria-label="Mobile layout for slide 30">
+    <div class="m-video-fill">
+      <img class="video-poster" src="https://media.globalimaige.com/shared/gap/s30/image139.png" alt="" draggable="false">
+      <video preload="auto" muted autoplay playsinline
+             poster="https://media.globalimaige.com/shared/gap/s30/image139.png" src="https://media.globalimaige.com/shared/gap/s30/media5.mp4"></video>
+      <button type="button" class="unmute-btn" aria-label="Unmute video" data-unmute><svg class="ic-muted" viewBox="0 0 24 24"><use href="#ic-muted"/></svg><svg class="ic-unmuted" viewBox="0 0 24 24"><use href="#ic-unmuted"/></svg></button>
+    </div>
+  </article>
+</section>
+</div>
+
+</main>
+
+<!-- Shared SVG sprite for unmute icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="ic-muted" viewBox="0 0 24 24">
+      <path d="M11 5L6 9H3v6h3l5 4V5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="ic-unmuted" viewBox="0 0 24 24">
+      <path d="M11 5L6 9H3v6h3l5 4V5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"  fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<script>
+/* Consolidated IO + unmute toggle.
+   - Observes EACH inner .deck-slide.
+   - Root = MAIN#deck (the scroll-snap parent).
+   - threshold ~0.5: when ≥50% of a slide is visible, that slide is "active".
+   - On active: play() each <video> in the slide; toggle 'is-active' on the outer
+     .editor-slide-group via .closest(). On leave: pause and remove the class.
+   - Each unmute button drives the video in its closest .video-panel / .m-video / .video-fill / .m-video-fill. */
+(function() {
+  const root = document.getElementById('deck');
+  const slides = document.querySelectorAll('main#deck .deck-slide');
+  if (!slides.length) return;
+
+  // Initialize every video at 50% volume so unmute-on-mobile isn't ear-splitting.
+  // Volume persists across mute toggles (muted just gates output, doesn't change volume).
+  const VOLUME = 0.5;
+  document.querySelectorAll('main#deck video').forEach(v => { v.volume = VOLUME; });
+
+  // Reset the unmute-button visual + aria state to its muted default.
+  function resetUnmuteBtn(panel) {
+    if (!panel) return;
+    const btn = panel.querySelector('[data-unmute]');
+    if (!btn) return;
+    btn.classList.remove('is-unmuted');
+    btn.setAttribute('aria-label', 'Unmute video');
+  }
+  function panelOf(v) {
+    return v.closest('.video-panel, .m-video, .video-fill, .m-video-fill');
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const outer = e.target.closest('.editor-slide-group');
+      const vids  = e.target.querySelectorAll('video');
+      if (e.isIntersecting && e.intersectionRatio >= 0.5) {
+        outer && outer.classList.add('is-active');
+        // Play-once-per-enter, MUTED. Never inherit a prior unmuted state.
+        vids.forEach(v => {
+          v.muted = true;
+          v.volume = VOLUME;
+          resetUnmuteBtn(panelOf(v));
+          try { v.currentTime = 0; } catch(_){}
+          const p = v.play();
+          if (p && typeof p.then === 'function') p.catch(()=>{});
+        });
+      } else {
+        outer && outer.classList.remove('is-active');
+        // Off-screen: pause, rewind, RE-MUTE so audio can never play out of view.
+        vids.forEach(v => {
+          try { v.pause(); } catch(_){}
+          v.muted = true;
+          v.volume = VOLUME;
+          try { v.currentTime = 0; } catch(_){}
+          resetUnmuteBtn(panelOf(v));
+        });
+      }
+    });
+  }, { root: root, threshold: [0, 0.5, 1.0] });
+
+  slides.forEach(s => io.observe(s));
+
+  document.querySelectorAll('[data-unmute]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const panel = btn.closest('.video-panel, .m-video, .video-fill, .m-video-fill');
+      const vid = panel && panel.querySelector('video');
+      if (!vid) return;
+      vid.muted = !vid.muted;
+      btn.classList.toggle('is-unmuted', !vid.muted);
+      btn.setAttribute('aria-label', vid.muted ? 'Unmute video' : 'Mute video');
+      if (!vid.muted) {
+        const p = vid.play();
+        if (p && typeof p.then === 'function') p.catch(()=>{});
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
